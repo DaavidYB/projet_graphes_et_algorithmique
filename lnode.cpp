@@ -192,10 +192,12 @@ void lnode::mat_adj(vector<vector<int>>& mat_adj)
             // d_n in crt_ct is the cost and d_next_m->d_n is the successor
             mat_adj[i][crt_ct->d_next_m->d_n] = 1;
             crt_ct = crt_ct->d_next_s;
+            ++m;
         }
         crt = crt->d_next_m;
         ++i;
     }
+    mat_adj[0][1] = m;
 }
 
 }
