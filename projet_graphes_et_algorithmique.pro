@@ -4,8 +4,8 @@ CONFIG -= app_bundle
 CONFIG -= qt
 
 SOURCES += \
-        lnode.cpp \
+        graph.cpp \
         main.cpp
 
 HEADERS += \
-    lnode.h
+    graph.h
