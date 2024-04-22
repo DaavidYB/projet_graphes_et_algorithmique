@@ -109,7 +109,7 @@ namespace graphalgo
     void graph::add_node()
     {
         if(!d_tete)
-            d_tete = new node(1);
+            d_tete = new node(++d_n);
         else {
             node* crt = d_tete;
 
