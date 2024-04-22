@@ -5,7 +5,9 @@ CONFIG -= qt
 
 SOURCES += \
         graph.cpp \
+        algorithmes.cpp \
         main.cpp
 
 HEADERS += \
-    graph.h
+    graph.h \
+    algorithmes.h

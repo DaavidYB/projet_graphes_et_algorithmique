@@ -243,7 +243,7 @@ void kruskal(const graphalgo::graph& G, graphalgo::graph& T) {
     pilch[0] = 0;
 
     // Stockage des arêtes avec leur poids
-    vector<graphalgo::vt> aretes;
+    vector<graphalgo::vtx> aretes;
     // Récupération de toutes les arêtes du graphe G
     for(int i = 1; i <= nbSommets; i++) {
         // On récupère le successeur
@@ -274,10 +274,3 @@ void kruskal(const graphalgo::graph& G, graphalgo::graph& T) {
         }
     }
 }
-
-
-1 : 2(1), 3(2), 4(3)
-2 : 1(2), 5(3)
-3
-4
-5

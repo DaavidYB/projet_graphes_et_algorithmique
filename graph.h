@@ -7,7 +7,7 @@ using std::vector;
 
 namespace graphalgo
 {
-    struct vt {
+    struct vtx {
         int s,t;
         int p;
     };
@@ -57,7 +57,7 @@ namespace graphalgo
              * @param oriented: the graph is oriented or not
              * @pre n > 1
              */
-            graph(unsigned int n, bool oriented);
+            graph(unsigned int n, bool oriented = true);
             /**
              * @brief graph create a graph using fs & aps;
              * @param fs
@@ -136,16 +136,18 @@ namespace graphalgo
              */
             void fs_aps(vector<int>& fs, vector<int>& aps);
             /**
-             * @brief transform the graph to an adjacency matrix
-             * @param mat_adj
+             * @brief retrun the adjacency matrix of the graph
+             * @retrun vector<vector<int>>
              */
-            void mat_adj(vector<vector<int>>& mat_adj);
+            vector<vector<int>> mat_adj();
 
             /**
              * @brief get all the vertex of a graph
              * @return a vector of vt
              */
-            vector<vt> vertexes() const;
+            vector<vtx> vertexes() const;
+
+            vector<vector<int>> cost_matrice() const;
 
         private:
             // nb of node

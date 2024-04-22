@@ -16,7 +16,7 @@ namespace graphalgo
     {
         d_tete = new node(1);
         node *crt = d_tete;
-        for(int i = 1; i <= d_n; ++i)
+        for(int i = 2; i <= d_n; ++i)
         {
             crt->d_next_m = new node(i);
             crt = crt->d_next_m;
@@ -88,9 +88,7 @@ namespace graphalgo
         }
     }
 
-    int graph::n() const{
-        return d_n;
-    }
+    int graph::n() const { return d_n; }
 
     bool graph::oriented() const { return d_oriented; }
 
@@ -100,11 +98,8 @@ namespace graphalgo
     {
         if(!d_tete)
             return nullptr;
-        else if(d_tete && d_tete->d_n == s)
-            return d_tete;
 
         node* crt = d_tete;
-
         while(crt && crt->d_n != s)
             crt = crt->d_next_m;
 
@@ -312,41 +307,72 @@ namespace graphalgo
         mat_adj[0][1] = m;
     }
 
-    void graph::mat_adj(vector<vector<int>>& mat_adj)
+    vector<vector<int>> graph::mat_adj()
     {
         if(!d_tete)
-            return;
+            return {};
 
-        mat_adj.clear();
-        mat_adj.resize(d_n + 1);
+        vector<vector<int>> adj_mat(d_n + 1, vector<int>(d_n + 1, 0));
 
-        mat_adj[0] = vector<int>(d_n + 1, -1);
-        mat_adj[0][0] = d_n;
-
-        // creating of each line
-        for(int s = 1; s <= d_n; ++s)
-            mat_adj[s] = vector<int>(d_n + 1, 0);
+        adj_mat[0][0] = d_n;
 
         if(d_oriented)
-            mat_adj_oriented(mat_adj);
+            mat_adj_oriented(adj_mat);
         else
-            mat_adj_not_oriented(mat_adj);
+            mat_adj_not_oriented(adj_mat);
+
+        return adj_mat;
     }
 
-    vector<vt> graph::vertexes() const {
-        vector<graphalgo::vt> aretes;
-        // Récupération de toutes les arêtes du graphe G
-        for(int i = 1; i <= d_n; i++) {
-            // On récupère le successeur
-            graphalgo::node* crt = &G.find(i)->next_s();
-            // Tant qu'il y a des successeurs, on crée les arêtes correspondantes
-            while(crt) {
-                aretes.emplace_back(crt->n(), std::make_pair(i, crt->next_m().n()));
-                crt = &crt->next_s();
+    vector<vtx> graph::vertexes() const
+    {
+        vector<vtx> vtxs;
+        vtxs.reserve(d_n * d_n);
+
+        node *crt = d_tete;
+        while(crt)
+        {
+            node* crt_ct = crt->d_next_s;
+            // going to all the successors of the current node and get the cost
+            while(crt_ct)
+            {
+                // crt_ct->d_n is the cost and crt_ct->d_next_m->d_n is the successor of crt->d_n
+                vtx vt;
+                vt.s = crt->d_n;
+                vt.t = crt_ct->d_next_m->d_n;
+                vt.p = crt_ct->d_n;
+
+                vtxs.push_back(vt);
+                crt_ct = crt_ct->d_next_s;
             }
+            crt = crt->d_next_m;
         }
 
-        return aretes;
+        return vtxs;
+    }
+
+    vector<vector<int>> graph::cost_matrice() const
+    {
+        vector<vector<int>> ct_mat(d_n, vector<int>(d_n, -__INT_MAX__));
+
+        node *crt = d_tete;
+        while(crt)
+        {
+            int s = crt->d_n;
+            node* crt_ct = crt->d_next_s;
+            // going to all the successors of the current node and get the cost
+            while(crt_ct)
+            {
+                // crt_ct->d_n is the cost and crt_ct->d_next_m->d_n is the successor of crt->d_n
+                int t = crt_ct->d_next_m->d_n;
+                ct_mat[s][t] = crt_ct->d_n;
+
+                crt_ct = crt_ct->d_next_s;
+            }
+            crt = crt->d_next_m;
+        }
+
+        return ct_mat;
     }
 
 }
