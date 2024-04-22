@@ -88,6 +88,10 @@ namespace graphalgo
         }
     }
 
+    int graph::n() const{
+        return d_n;
+    }
+
     bool graph::oriented() const { return d_oriented; }
 
     void graph::oriented(bool oriented) { d_oriented = oriented; }
@@ -327,6 +331,22 @@ namespace graphalgo
             mat_adj_oriented(mat_adj);
         else
             mat_adj_not_oriented(mat_adj);
+    }
+
+    vector<vt> graph::vertexes() const {
+        vector<graphalgo::vt> aretes;
+        // Récupération de toutes les arêtes du graphe G
+        for(int i = 1; i <= d_n; i++) {
+            // On récupère le successeur
+            graphalgo::node* crt = &G.find(i)->next_s();
+            // Tant qu'il y a des successeurs, on crée les arêtes correspondantes
+            while(crt) {
+                aretes.emplace_back(crt->n(), std::make_pair(i, crt->next_m().n()));
+                crt = &crt->next_s();
+            }
+        }
+
+        return aretes;
     }
 
 }

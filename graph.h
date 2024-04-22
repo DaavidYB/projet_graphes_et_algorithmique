@@ -2,10 +2,16 @@
 #define GRAPH_H
 
 #include <vector>
+#include <utility>
 using std::vector;
 
 namespace graphalgo
 {
+    struct vt {
+        int s,t;
+        int p;
+    };
+
     class node
     {
         public:
@@ -68,6 +74,13 @@ namespace graphalgo
              */
             ~graph();
 
+            // Getteurs
+            /**
+             * @brief Méthode publique retournant le contenu de d_n
+             * @return
+             */
+            int n() const;
+
             // methods
 
             bool oriented() const;
@@ -127,6 +140,13 @@ namespace graphalgo
              * @param mat_adj
              */
             void mat_adj(vector<vector<int>>& mat_adj);
+
+            /**
+             * @brief get all the vertex of a graph
+             * @return a vector of vt
+             */
+            vector<vt> vertexes() const;
+
         private:
             // nb of node
             int d_n;
