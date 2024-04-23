@@ -38,7 +38,7 @@ namespace graphalgo
     {
         d_tete = new node(1);
         node *crt = d_tete;
-        for(int i = 1; i <= d_n; ++i)
+        for(int i = 2; i <= d_n; ++i)
         {
             crt->d_next_m = new node(i);
             crt = crt->d_next_m;
@@ -59,7 +59,7 @@ namespace graphalgo
     {
         d_tete = new node(1);
         node *crt = d_tete;
-        for(int i = 1; i <= d_n; ++i)
+        for(int i = 2; i <= d_n; ++i)
         {
             crt->d_next_m = new node(i);
             crt = crt->d_next_m;
