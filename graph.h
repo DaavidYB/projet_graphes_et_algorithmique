@@ -13,6 +13,8 @@ namespace graphalgo
         int p;
     };
 
+    bool compare_vtx(const vtx &a, const vtx &b);
+
     class node
     {
         public:

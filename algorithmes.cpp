@@ -74,7 +74,7 @@ vector<int> rang(const vector<int>& fs, const vector<int>& aps) {
     pilch[0] = 0;
     for(sommetCourant = 1; sommetCourant <= nbSommets; sommetCourant++)
         if(ddi[sommetCourant] == 0)
-            graphalgo::empiler(sommetCourant, pilch);
+            empiler(sommetCourant, pilch);
 
     r = -1;
     sommetCourant = pilch[0];
@@ -243,34 +243,24 @@ void kruskal(const graphalgo::graph& G, graphalgo::graph& T) {
     pilch[0] = 0;
 
     // Stockage des arêtes avec leur poids
-    vector<graphalgo::vtx> aretes;
-    // Récupération de toutes les arêtes du graphe G
-    for(int i = 1; i <= nbSommets; i++) {
-        // On récupère le successeur
-        graphalgo::node* crt = &G.find(i)->next_s();
-        // Tant qu'il y a des successeurs, on crée les arêtes correspondantes
-        while(crt) {
-            aretes.emplace_back(crt->n(), std::make_pair(i, crt->next_m().n()));
-            crt = &crt->next_s();
-        }
-    }
+    vector<graphalgo::vtx> aretes = G.vertexes();
 
     // On trie les arêtes par poids croissant
-    sort(aretes.begin(), aretes.end());
+    // sort(aretes.begin(), aretes.end());
 
     int k = 0;
     for(const auto& a : aretes) {
         // On récupère les extrémités de l'arête
-        int s = a.second.first;
-        int t = a.second.second;
-        if(cfc[s] != cfc[t]) {
-            // Ajouter le successeur si on n'a pas de circuit (même CFC)
-            T.add_successor(s, t, a.first);
-            fusion(s, t, prem, pilch, cfc);
-            k++;
-
-            // On s'arrête quand l'arbre couvrant est complet
-            if(k == nbSommets - 1) break;
-        }
+        // int s = a.second.first;
+        // int t = a.second.second;
+        // if(cfc[s] != cfc[t]) {
+        //     // Ajouter le successeur si on n'a pas de circuit (même CFC)
+        //     T.add_successor(s, t, a.first);
+        //     fusion(s, t, prem, pilch, cfc);
+        //     k++;
+        //tests◊
+        //     // On s'arrête quand l'arbre couvrant est complet
+        //     if(k == nbSommets - 1) break;
+        // }
     }
 }

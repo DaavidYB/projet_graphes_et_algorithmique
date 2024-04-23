@@ -1,7 +1,18 @@
 #include "graph.h"
+#include <algorithm>
 
 namespace graphalgo
 {
+    bool compare_vtx(const vtx &a, const vtx &b)
+    {
+        // Si les valeurs de p sont égales, comparer s
+        if (a.p == b.p)
+            return a.s < b.s;
+        // Sinon, comparer les valeurs de p
+        else
+            return a.p < b.p;
+    }
+
     node::node(int n):d_n{n}, d_next_m{nullptr}, d_next_s{nullptr}
     {}
 
@@ -379,6 +390,7 @@ namespace graphalgo
             crt = crt->d_next_m;
         }
 
+        sort(vtxs.begin(), vtxs.end(), compare_vtx);
         return vtxs;
     }
 
@@ -396,7 +408,7 @@ namespace graphalgo
             {
                 // crt_ct->d_n is the cost and crt_ct->d_next_m->d_n is the successor of crt->d_n
                 int t = crt_ct->d_next_m->d_n;
-                ct_mat[s][t] = crt_ct->d_n;
+                ct_mat[s-1][t-1] = crt_ct->d_n;
 
                 crt_ct = crt_ct->d_next_s;
             }
@@ -405,5 +417,4 @@ namespace graphalgo
 
         return ct_mat;
     }
-
 }
