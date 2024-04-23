@@ -23,7 +23,7 @@ namespace graphalgo
         }
     }
 
-    graph::graph(const vector<int>& fs, const vector<int>& aps, bool oriented): d_n{aps[0]}, d_oriented{oriented}
+    graph::graph(const vector<int>& fs, const vector<int>& aps): d_n{aps[0]}, d_oriented{true}
     {
         d_tete = new node(1);
         node *crt = d_tete;
@@ -37,7 +37,7 @@ namespace graphalgo
         for(int i = 1; i <= fs[0]; ++i)
         {
             node* ct;
-            if(fs[i] != 0 && !vertex(s, fs[i], ct))
+            if(fs[i] != 0)
                 add_successor(s, fs[i]);
             else
                 ++s;
@@ -59,7 +59,7 @@ namespace graphalgo
             for(int j = 1; j <= d_n; ++j)
             {
                 node* ct;
-                if(mat_adj[i][j] == 1 && !vertex(i, j, ct))
+                if(mat_adj[i][j] == 1 && (!vertex(i, j, ct) || d_oriented))
                     add_successor(i, j);
             }
         }
@@ -139,9 +139,16 @@ namespace graphalgo
         else
         {
             node* crt_c = ns->d_next_s;
-            while(crt_c->d_next_s)
+            while(crt_c->d_next_s && crt_c->d_next_m != nss)
                 crt_c = crt_c->d_next_s;
-            crt_c->d_next_s = new_c;
+            
+            if(crt_c->d_next_m == nss)
+            {
+                delete new_c;
+                crt_c->d_n = cost;
+            }
+            else
+                crt_c->d_next_s = new_c;
         }
     }
 
@@ -204,11 +211,30 @@ namespace graphalgo
         return nullptr;
     }
 
+    node* graph::vertex(int s, int ss) const
+    {
+        node* ns = find(s);
+
+        if(!ns)
+            return nullptr;
+
+        node* crt_ct = ns->d_next_s;
+        while(crt_ct && crt_ct->d_next_m->d_n != ss)
+            crt_ct = crt_ct->d_next_s;
+        // at this point crt_ct would be nullptr or equal to the cost of the vertex
+        return crt_ct;
+    }
+
     int graph::cost(int s, int ss) const
     {
-        node* crt_ct;
+        node* crt_ct = nullptr;
 
-        if(vertex(s, ss, crt_ct))
+        if(d_oriented)
+            crt_ct = vertex(s, ss);
+        else
+            vertex(s, ss, crt_ct);
+
+        if(crt_ct != nullptr)
             return crt_ct->d_n;
         else
             return -__INT_MAX__;
@@ -216,9 +242,14 @@ namespace graphalgo
 
     void graph::cost(int s, int ss, int cost)
     {
-        node* crt_ct;
+        node* crt_ct = nullptr;
 
-        if(vertex(s, ss, crt_ct))
+        if(d_oriented)
+            crt_ct = vertex(s, ss);
+        else
+            vertex(s, ss, crt_ct);
+
+        if(crt_ct != nullptr)
             crt_ct->d_n = cost;
     }
 

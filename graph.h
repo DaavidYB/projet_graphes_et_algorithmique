@@ -7,7 +7,8 @@ using std::vector;
 
 namespace graphalgo
 {
-    struct vtx {
+    struct vtx
+    {
         int s,t;
         int p;
     };
@@ -63,7 +64,7 @@ namespace graphalgo
              * @param fs
              * @param aps
              */
-            graph(const vector<int>& fs, const vector<int>& aps, bool oriented = true);
+            graph(const vector<int>& fs, const vector<int>& aps);
             /**
              * @brief create a graph using an adjacency matrix;
              * @param mat_adj: the adjacency matrix
@@ -108,13 +109,20 @@ namespace graphalgo
              */
             void add_successor(int s, int ss, int cost = __INT_MAX__);
             /**
-             * @brief checks if there is a vertex between two node
+             * @brief checks if there is a vertex between two node of a not oriented graph
              * @param s
              * @param ss
              * @param ct: a pointer to the cost of the vertex
              * @return the vertex head if there is, nullptr if there isn't
              */
             node* vertex(int s, int ss, node*& ct) const;
+            /**
+             * @brief checks if there is a vertex between two node of a oriented graph
+             * @param s
+             * @param ss
+             * @return the cost of the vertex if there is, nullptr if there isn't
+             */
+            node* vertex(int s, int ss) const;
             /**
              * @brief get the cost of a vertex
              * @param s
