@@ -152,7 +152,6 @@ vector<int> prufer(const vector<vector<int>>& a) {
     return prf;
 }
 
-
 pair<vector<int>, vector<int>> Dijkstra(int s, const vector<int>& fs, const vector<int>& aps, const vector<vector<int>>& C) {
     int v, j, minDist;
     int nbSommet = aps[0];
@@ -245,22 +244,18 @@ void kruskal(const graphalgo::graph& G, graphalgo::graph& T) {
     // Stockage des arêtes avec leur poids
     vector<graphalgo::vtx> aretes = G.vertexes();
 
-    // On trie les arêtes par poids croissant
-    // sort(aretes.begin(), aretes.end());
-
     int k = 0;
     for(const auto& a : aretes) {
         // On récupère les extrémités de l'arête
-        // int s = a.second.first;
-        // int t = a.second.second;
-        // if(cfc[s] != cfc[t]) {
-        //     // Ajouter le successeur si on n'a pas de circuit (même CFC)
-        //     T.add_successor(s, t, a.first);
-        //     fusion(s, t, prem, pilch, cfc);
-        //     k++;
-        //tests◊
-        //     // On s'arrête quand l'arbre couvrant est complet
-        //     if(k == nbSommets - 1) break;
-        // }
+        int s = a.s;
+        int t = a.t;
+        if(cfc[s] != cfc[t]) {
+            // Ajouter le successeur si on n'a pas de circuit (même CFC)
+            T.add_successor(s, t, a.p);
+            fusion(s, t, prem, pilch, cfc);
+            k++;
+            // On s'arrête quand l'arbre couvrant est complet
+            if(k == nbSommets - 1) break;
+        }
     }
 }
