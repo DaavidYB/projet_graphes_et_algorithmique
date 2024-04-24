@@ -13,7 +13,7 @@ class MainWindow : public QMainWindow
     Q_OBJECT
 
 public:
-    MainWindow(QWidget *parent = nullptr);
+    explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
 
 private :
@@ -41,6 +41,7 @@ private :
      * @brief Méthode privée générant les composants de la mainWindow
      */
     void createInterface();
+
     /**
      * @brief Méthode privée montrant les sous-options de saisies textuelles
      */
@@ -57,16 +58,32 @@ private :
      * @brief Méthode privée cachant les sous-options de saisies par fichiers
      */
     void hideFichierGroup();
+    /**
+     * @brief Méthode privée cachant tous les groupes de boutons
+     */
+    void hideButtonGroup();
 
 private slots :
     /**
-     * @brief Signal privé réagissant au clic du bouton buttonSaisie
+     * @brief Méthode privée réagissant au clic du bouton buttonSaisie
      */
     void onSaisie();
     /**
-     * @brief Signal privé réagissant au clic du bouton buttonFichier
+     * @brief Méthode privée réagissant au clic du bouton buttonFichier
      */
     void onFichier();
+    /**
+     * @brief Méthoed privée réagissant au clic du bouton bSaisieFsAps
+     */
+    void onSaisieFsAps();
+    /**
+     * @brief Méthoed privée réagissant au clic du bouton bSaisieMatriceAdj
+     */
+    void onSaisieMatAdj();
+    /**
+     * @brief Méthoed privée réagissant au clic du bouton bSaisieListeSommets
+     */
+    void onSaisieListeSommets();
 };
 #endif // MAINWINDOW_H
 

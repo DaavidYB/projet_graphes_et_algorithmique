@@ -9,12 +9,14 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    composents/matadjinput.cpp \
     graph/algorithmes.cpp \
     graph/graph.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
+    composents/matadjinput.h \
     graph/algorithmes.h \
     graph/graph.h \
     mainwindow.h

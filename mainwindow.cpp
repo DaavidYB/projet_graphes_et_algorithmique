@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "composents/matadjinput.h"
 #include <QWidget>
 #include <QBoxLayout>
 #include <QComboBox>
@@ -6,6 +7,8 @@
 #include <QButtonGroup>
 #include <QList>
 #include <QLabel>
+
+// CONSTRUCTEURS
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -17,7 +20,12 @@ MainWindow::~MainWindow()
 {
     // Delete les pointeurs
     delete d_listeAlgorithmes;
+    delete d_buttonLancerAlgo;
+    delete d_saisieGroup;
+    delete fichierGroup;
 }
+
+// CRÉATION DE L'INTERFACE
 
 void MainWindow::createInterface()
 {
@@ -69,30 +77,30 @@ void MainWindow::createInterface()
 
     // On crée le layout contenant les sous-options de saisie textuelle
     auto buttonSaisieLayout {new QVBoxLayout{}};
-    auto bDessinFsAps {new QPushButton{"par FS APS"}};
-    auto bDessinMatriceAdj {new QPushButton{"par matrice d'adjacence"}};
-    auto bDessinListeSommets {new QPushButton{"par liste de sommets"}};
+    auto bSaisieFsAps {new QPushButton{"par FS APS"}};
+    auto bSaisieMatriceAdj {new QPushButton{"par matrice d'adjacence"}};
+    auto bSaisieListeSommets {new QPushButton{"par liste de sommets"}};
 
-    buttonSaisieLayout->addWidget(bDessinFsAps);
-    buttonSaisieLayout->addWidget(bDessinMatriceAdj);
-    buttonSaisieLayout->addWidget(bDessinListeSommets);
+    buttonSaisieLayout->addWidget(bSaisieFsAps);
+    buttonSaisieLayout->addWidget(bSaisieMatriceAdj);
+    buttonSaisieLayout->addWidget(bSaisieListeSommets);
     // On génère le groupe de boutons de saisie textuelle
     d_saisieGroup = new QButtonGroup{};
-    d_saisieGroup->addButton(bDessinFsAps);
-    d_saisieGroup->addButton(bDessinMatriceAdj);
-    d_saisieGroup->addButton(bDessinListeSommets);
+    d_saisieGroup->addButton(bSaisieFsAps);
+    d_saisieGroup->addButton(bSaisieMatriceAdj);
+    d_saisieGroup->addButton(bSaisieListeSommets);
     hideSaisieGroup();
 
     // On crée le layout contenant les sous-options de saisie par fichier
     auto buttonFichierLayout {new QVBoxLayout{}};
-    auto bSaisieFsAps {new QPushButton{"par FS APS"}};
-    auto bSaisieMatriceAdj {new QPushButton{"par matrice d'adjacence"}};
-    buttonFichierLayout->addWidget(bSaisieFsAps);
-    buttonFichierLayout->addWidget(bSaisieMatriceAdj);
+    auto bFichierFsAps {new QPushButton{"par FS APS"}};
+    auto bFichierMatriceAdj {new QPushButton{"par matrice d'adjacence"}};
+    buttonFichierLayout->addWidget(bFichierFsAps);
+    buttonFichierLayout->addWidget(bFichierMatriceAdj);
     // On génère le groupe de boutons de saisie par fichier
     fichierGroup = new QButtonGroup{};
-    fichierGroup->addButton(bSaisieFsAps);
-    fichierGroup->addButton(bSaisieMatriceAdj);
+    fichierGroup->addButton(bFichierFsAps);
+    fichierGroup->addButton(bFichierMatriceAdj);
     hideFichierGroup();
 
     // On implémente le buttonLayout
@@ -104,9 +112,19 @@ void MainWindow::createInterface()
     buttonLayout->addWidget(buttonSauvegarder);
 
     // On connecte les boutons à leur action
+    // connect(buttonDessin, &QPushButton::clicked, this, ...);
     connect(buttonSaisie, &QPushButton::clicked, this, &MainWindow::onSaisie);
+    connect(bSaisieFsAps, &QPushButton::clicked, this, &MainWindow::onSaisieFsAps);
+    connect(bSaisieMatriceAdj, &QPushButton::clicked, this, &MainWindow::onSaisieMatAdj);
+    connect(bSaisieListeSommets, &QPushButton::clicked, this, &MainWindow::onSaisieListeSommets);
     connect(buttonFichier, &QPushButton::clicked, this, &MainWindow::onFichier);
+    // connect(bSaisieMatriceAdj, &QPushButton::clicked, this, ...);
+    // connect(bFichierFsAps, &QPushButton::clicked, this, ...);
+    // connect(bFichierMatriceAdj, &QPushButton::clicked, this, ...);
+    // connect(buttonSauvegarder, &QPushButton::clicked, this, ...);
 }
+
+// SHOW / HIDE
 
 void MainWindow::showSaisieGroup()
 {
@@ -136,6 +154,14 @@ void MainWindow::hideFichierGroup()
         b->setVisible(false);
 }
 
+void MainWindow::hideButtonGroup()
+{
+    hideSaisieGroup();
+    hideFichierGroup();
+}
+
+// MÉTHODES ONCLIC
+
 void MainWindow::onSaisie()
 {
     if(saisieGroupVisible){
@@ -156,6 +182,23 @@ void MainWindow::onFichier()
         fichierGroupVisible = true;
         this->showFichierGroup();
     }
+}
+
+void MainWindow::onSaisieFsAps()
+{
+    hideButtonGroup();
+}
+
+void MainWindow::onSaisieMatAdj()
+{
+    hideButtonGroup();
+    matAdjInput *widget {new matAdjInput{}};
+    widget->show();
+}
+
+void MainWindow::onSaisieListeSommets()
+{
+    hideButtonGroup();
 }
 
 
