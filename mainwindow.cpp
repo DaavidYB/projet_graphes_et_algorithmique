@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "composents/matadjinput.h"
+#include "composents/fsapsInput.h"
 #include <QWidget>
 #include <QBoxLayout>
 #include <QComboBox>
@@ -23,6 +24,10 @@ MainWindow::~MainWindow()
     delete d_buttonLancerAlgo;
     delete d_saisieGroup;
     delete fichierGroup;
+    if (d_currentInputWindow) {
+        d_currentInputWindow->close();
+        delete d_currentInputWindow;
+    }
 }
 
 // CRÉATION DE L'INTERFACE
@@ -162,6 +167,19 @@ void MainWindow::hideButtonGroup()
 
 // MÉTHODES ONCLIC
 
+void MainWindow::onGrapheReceived(const graphalgo::graph& g)
+{
+    // Mettre à jour l'affichage du graphe
+    d_graph = g;
+    // Appel de la méthode pour mettre à jour l'affichage du graphe
+
+    // Fermer la fenêtre de saisie
+    if(d_currentInputWindow) {
+        d_currentInputWindow->close();
+        d_currentInputWindow = nullptr;
+    }
+}
+
 void MainWindow::onSaisie()
 {
     if(saisieGroupVisible){
@@ -187,18 +205,37 @@ void MainWindow::onFichier()
 void MainWindow::onSaisieFsAps()
 {
     hideButtonGroup();
+    // On crée la fenêtre
+    d_currentInputWindow = new fsapsInput{};
+
+    // On connecte le signal transmis après la création
+    connect(static_cast<fsapsInput*>(d_currentInputWindow), &fsapsInput::graphe, this, &MainWindow::onGrapheReceived);
+    // On affiche la fenêtre
+    d_currentInputWindow->show();
 }
 
 void MainWindow::onSaisieMatAdj()
 {
     hideButtonGroup();
-    matAdjInput *widget {new matAdjInput{}};
-    widget->show();
+    // On crée la fenêtre
+    d_currentInputWindow = new matAdjInput{};
+
+    // On connecte le signal transmis après la création
+    connect(static_cast<matAdjInput*>(d_currentInputWindow), &matAdjInput::graphe, this, &MainWindow::onGrapheReceived);
+    // On affiche la fenêtre
+    d_currentInputWindow->show();
 }
 
 void MainWindow::onSaisieListeSommets()
 {
     hideButtonGroup();
+    // // On crée la fenêtre
+    // d_currentInputWindow = new vertexInput{};
+    //
+    // // On connecte le signal transmis après la création
+    // connect(static_cast<vertexInput*>(d_currentInputWindow), &vertexInput::graphe, this, &MainWindow::onGrapheReceived);
+    // // On affiche la fenêtre
+    // d_currentInputWindow->show();
 }
 
 

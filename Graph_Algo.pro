@@ -9,6 +9,7 @@ CONFIG += c++17
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
+    composents/fsapsInput.cpp \
     composents/matadjinput.cpp \
     graph/algorithmes.cpp \
     graph/graph.cpp \
@@ -16,6 +17,7 @@ SOURCES += \
     mainwindow.cpp
 
 HEADERS += \
+    composents/fsapsInput.h \
     composents/matadjinput.h \
     graph/algorithmes.h \
     graph/graph.h \

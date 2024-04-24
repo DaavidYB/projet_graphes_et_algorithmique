@@ -35,6 +35,10 @@ private :
      * @brief Group de boutons regroupant les différentes options de saisies textuelles / par fichiers
      */
     QButtonGroup *d_saisieGroup, *fichierGroup;
+    /**
+     * @brief Pointeur vers le widget de la fenêtre de saisie en cours
+     */
+    QWidget* d_currentInputWindow = nullptr;
 
 
     /**
@@ -64,6 +68,11 @@ private :
     void hideButtonGroup();
 
 private slots :
+    /**
+     * @brief Méthode gérant la réception des signaux, à la suite de la saisie d'un graphe
+     * @param g - le graphe reçu
+     */
+    void onGrapheReceived(const graphalgo::graph& g);
     /**
      * @brief Méthode privée réagissant au clic du bouton buttonSaisie
      */
