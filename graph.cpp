@@ -406,4 +406,24 @@ namespace graphalgo
         return ct_mat;
     }
 
+    void graph::save(std::ostream& ost) const
+    {
+        ost << d_n << "" << d_oriented << std::endl;
+        
+        node* crt = d_tete;
+
+        while(crt)
+        {
+            ost << crt->d_n;
+
+            node* crt_ct = crt->d_next_s;
+            while(crt_ct)
+            {
+                ost << " " << crt_ct->d_next_m->d_n << "-" << crt_ct->d_n;
+                crt_ct = crt_ct->d_next_s;
+            }
+
+            crt = crt->d_next_m;
+        }
+    }
 }
