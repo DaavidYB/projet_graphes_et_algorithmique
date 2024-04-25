@@ -40,7 +40,7 @@ void matAdjInput::createInterface()
     mainLayout->addWidget(titleLigne);
 
     // On génère un QHBoxLayout pour les données de pré-saisie
-    auto preSaisieLayout {new QHBoxLayout{this}};
+    auto preSaisieLayout {new QHBoxLayout{}};
     mainLayout->addLayout(preSaisieLayout);
 
     // On génère les inputs et bales de saisie
@@ -74,7 +74,7 @@ void matAdjInput::createInterface()
         bool ok;
         unsigned value = text.toUInt(&ok);
 
-        if(ok) onNbSommets(value);
+        if (ok) onNbSommets(value);
     });
     connect(bValide, &QPushButton::clicked, this, &matAdjInput::createGraph);
 }
@@ -118,13 +118,6 @@ bool matAdjInput::recupereValide(std::vector<std::vector<int>> &matAdj) const
     // On initialise un compteur
     int compt = 0;
 
-    std::vector<std::vector<QString>> test(nbLignes);
-    for(int i = 0; i < nbLignes; i++){
-        for(int j = 0; j < nbLignes; j++){
-            test[i].push_back(d_matrice->item(i, j)->text());
-        }
-    }
-
     // On fait défiler les lignes
     int i = 0;
     while(valide && i < nbLignes){
@@ -133,7 +126,7 @@ bool matAdjInput::recupereValide(std::vector<std::vector<int>> &matAdj) const
         while(valide && j < nbLignes){
             // On récupère la valeur de la case
             bool isNumber;
-            unsigned number = d_matrice->item(i, j)->text().toUInt(&isNumber);
+            int number = d_matrice->item(i, j)->text().toUInt(&isNumber);
 
             // On vérifie que la case est valide
             if (!isNumber){
@@ -142,7 +135,7 @@ bool matAdjInput::recupereValide(std::vector<std::vector<int>> &matAdj) const
                 // On compte les arrêtes
                 compt++;
                 // on implémente les données
-                matAdj[i + 1][j + 1] = number;
+                matAdj[i +1 ][j + 1] = number;
             }
             j++;
         }
@@ -165,7 +158,7 @@ void matAdjInput::createGraph()
             graphalgo::graph g{matAdj};
             emit graphe(g);
 
-        // Graph non-orienté
+            // Graph non-orienté
         }  else {
             graphalgo::graph g{matAdj};
             emit graphe(g);
@@ -182,21 +175,3 @@ void matAdjInput::onNbSommets(unsigned i)
     deleteMatrice();
     createMatrice(i);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

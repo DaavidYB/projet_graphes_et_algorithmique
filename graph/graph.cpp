@@ -264,7 +264,7 @@ namespace graphalgo
             crt_ct->d_n = cost;
     }
 
-    void graph::fs_aps(vector<int>& fs, vector<int>& aps)
+    void graph::fs_aps(vector<int> &fs, vector<int> &aps)
     {
         if(!d_tete)
             return;

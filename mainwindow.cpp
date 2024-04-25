@@ -1,6 +1,8 @@
 #include "mainwindow.h"
-#include "composents/matadjinput.h"
 #include "composents/fsapsInput.h"
+#include "composents/vertexinput.h"
+#include "composents/matadjinput.h"
+#include "composents/graphview.h"
 #include <QWidget>
 #include <QBoxLayout>
 #include <QComboBox>
@@ -8,6 +10,9 @@
 #include <QButtonGroup>
 #include <QList>
 #include <QLabel>
+#include <QFile>
+#include <QFileDialog>
+#include <QMessageBox>
 
 // CONSTRUCTEURS
 
@@ -43,8 +48,10 @@ void MainWindow::createInterface()
     mainWidget->setLayout(mainVerticalLayout);
 
     // Ajout du widget de graph
-    auto futurGraph {new QLabel{"Furtur Widget Graph"}};
-    mainVerticalLayout->addWidget(futurGraph);
+    // auto futurGraph {new QLabel{"Furtur Widget Graph"}};
+    // mainVerticalLayout->addWidget(futurGraph);
+    d_graphview = new graphView{};
+    mainVerticalLayout->addWidget(d_graphview);
 
     // On crére et implémente le layout horithal
     auto horizonthalLayout {new QHBoxLayout};
@@ -78,7 +85,7 @@ void MainWindow::createInterface()
     auto buttonDessin {new QPushButton{"Dessiner un nouveau graph"}};
     auto buttonSaisie {new QPushButton{"Saisie textuelle"}};
     auto buttonFichier {new QPushButton{"Télécharger un fichier"}};
-    auto buttonSauvegarder {new QPushButton{"Sauvegarderle graph"}};
+    auto buttonSauvegarder {new QPushButton{"Sauvegarder le graph"}};
 
     // On crée le layout contenant les sous-options de saisie textuelle
     auto buttonSaisieLayout {new QVBoxLayout{}};
@@ -119,14 +126,16 @@ void MainWindow::createInterface()
     // On connecte les boutons à leur action
     // connect(buttonDessin, &QPushButton::clicked, this, ...);
     connect(buttonSaisie, &QPushButton::clicked, this, &MainWindow::onSaisie);
+    connect(buttonFichier, &QPushButton::clicked, this, &MainWindow::onFichier);
+
     connect(bSaisieFsAps, &QPushButton::clicked, this, &MainWindow::onSaisieFsAps);
     connect(bSaisieMatriceAdj, &QPushButton::clicked, this, &MainWindow::onSaisieMatAdj);
     connect(bSaisieListeSommets, &QPushButton::clicked, this, &MainWindow::onSaisieListeSommets);
-    connect(buttonFichier, &QPushButton::clicked, this, &MainWindow::onFichier);
-    // connect(bSaisieMatriceAdj, &QPushButton::clicked, this, ...);
-    // connect(bFichierFsAps, &QPushButton::clicked, this, ...);
+
+    connect(bFichierFsAps, &QPushButton::clicked, this, &MainWindow::onFichierFsAps);
     // connect(bFichierMatriceAdj, &QPushButton::clicked, this, ...);
-    // connect(buttonSauvegarder, &QPushButton::clicked, this, ...);
+
+    connect(buttonSauvegarder, &QPushButton::clicked, this, &MainWindow::onSauvegarde);
 }
 
 // SHOW / HIDE
@@ -202,20 +211,7 @@ void MainWindow::onFichier()
     }
 }
 
-void MainWindow::onSaisieFsAps()
-{
-    hideButtonGroup();
-    // On crée la fenêtre
-    d_currentInputWindow = new fsapsInput{};
-
-    // On connecte le signal transmis après la création
-    connect(static_cast<fsapsInput*>(d_currentInputWindow), &fsapsInput::graphe, this, &MainWindow::onGrapheReceived);
-    // On affiche la fenêtre
-    d_currentInputWindow->show();
-}
-
-void MainWindow::onSaisieMatAdj()
-{
+void MainWindow::onSaisieMatAdj() {
     hideButtonGroup();
     // On crée la fenêtre
     d_currentInputWindow = new matAdjInput{};
@@ -226,34 +222,98 @@ void MainWindow::onSaisieMatAdj()
     d_currentInputWindow->show();
 }
 
+void MainWindow::onSaisieFsAps()
+{
+    hideButtonGroup();
+    // On crée la fenêtre
+    d_currentInputWindow = new fsapsInput{};
+    // On connecte le signal transmis après la création
+    connect(static_cast<fsapsInput*>(d_currentInputWindow), &fsapsInput::graphe, this, &MainWindow::onGrapheReceived);
+    // On affiche la fenêtre
+    d_currentInputWindow->show();
+}
+
 void MainWindow::onSaisieListeSommets()
 {
     hideButtonGroup();
-    // // On crée la fenêtre
-    // d_currentInputWindow = new vertexInput{};
-    //
-    // // On connecte le signal transmis après la création
-    // connect(static_cast<vertexInput*>(d_currentInputWindow), &vertexInput::graphe, this, &MainWindow::onGrapheReceived);
-    // // On affiche la fenêtre
-    // d_currentInputWindow->show();
+    // On crée la fenêtre
+    d_currentInputWindow = new vertexInput{};
+    // On connecte le signal transmis après la création
+    connect(static_cast<vertexInput*>(d_currentInputWindow), &vertexInput::graphe, this, &MainWindow::onGrapheReceived);
+    // On affiche la fenêtre
+    d_currentInputWindow->show();
 }
 
+void MainWindow::onFichierFsAps()
+{
+    hideButtonGroup();
+
+    // Ouvrir une boîte de dialogue pour sélectionner le fichier
+    QString fileName = QFileDialog::getOpenFileName(this, "Sélectionner un fichier FS-APS", "", "Fichiers texte (*.txt)");
+    if(fileName.isEmpty()) {
+        return; // L'utilisateur a annulé la sélection
+    }
+
+    // Lire le contenu du fichier
+    QFile file(fileName);
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, "Erreur de lecture", "Impossible d'ouvrir le fichier.");
+        return;
+    }
+
+    QTextStream in(&file);
+    QString fsLine = in.readLine();
+    QString apsLine = in.readLine();
+
+    // Vérifier la validité des données
+    std::vector<int> fs, aps;
+    if(!validationFsAps(fsLine, apsLine, fs, aps)) {
+        file.close();
+        return;
+    }
 
 
+    // Construire le graphe à partir de FS et APS
+    graphalgo::graph g{fs, aps};
 
+    // Émettre le graphe
+    onGrapheReceived(g);
 
+    file.close();
+}
 
+void MainWindow::onSauvegarde()
+{
+    // Ouvrir une boîte de dialogue pour permettre à l'utilisateur de choisir le fichier
+    QString fileName = QFileDialog::getSaveFileName(this, "Sauvegarder le graphe", "", "Fichiers texte (*.txt)");
+    if(fileName.isEmpty()) {
+        // L'utilisateur a annulé la sauvegarde
+        return;
+    }
 
+    // Ouvrir le fichier en écriture
+    QFile file(fileName);
+    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, "Erreur d'écriture", "Impossible d'ouvrir le fichier en écriture.");
+        return;
+    }
 
+    // Récupérer les tableaux FS et APS
+    std::vector<int> fs, aps;
+    std::vector<std::vector<int>> matAdj = d_graph.mat_adj();
+    d_graph.fs_aps(fs, aps);
 
+    // Écrire les tableaux FS et APS dans le fichier
+    QTextStream out(&file);
+    for(unsigned i = 0; i < fs.size() - 1; i++) {
+        out << fs[i] << " ";
+    }
+    out << fs[fs.size() - 1];
+    out << "\n";
+    for(unsigned i = 0; i < aps.size() - 1; i++) {
+        out << aps[i] << " ";
+    }
+    out << aps[aps.size() - 1];
 
-
-
-
-
-
-
-
-
-
-
+    file.close();
+}

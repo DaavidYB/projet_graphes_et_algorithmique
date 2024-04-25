@@ -10,7 +10,9 @@ CONFIG += c++17
 
 SOURCES += \
     composents/fsapsInput.cpp \
+    composents/graphview.cpp \
     composents/matadjinput.cpp \
+    composents/vertexinput.cpp \
     graph/algorithmes.cpp \
     graph/graph.cpp \
     main.cpp \
@@ -18,7 +20,9 @@ SOURCES += \
 
 HEADERS += \
     composents/fsapsInput.h \
+    composents/graphview.h \
     composents/matadjinput.h \
+    composents/vertexinput.h \
     graph/algorithmes.h \
     graph/graph.h \
     mainwindow.h

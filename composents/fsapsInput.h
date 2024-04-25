@@ -39,17 +39,19 @@ private:
      */
     QLineEdit *d_inputFS, *d_inputAPS;
     /**
-     * @brief Méthode privée pour valider la saisie des tableaux FS et APS
+     * @brief Méthode privée pour créer l'interface graphique
+     */
+    void createInterface();
+};
+
+/**
+     * @brief Méthode pour valider la saisie des tableaux FS et APS
      * @param saisieFS La saisie du tableau FS
      * @param saisieAPS La saisie du tableau APS
      * @param fs Le vecteur qui contiendra les valeurs du tableau FS
      * @param aps Le vecteur qui contiendra les valeurs du tableau APS
      * @return true si la saisie est valide, false sinon
      */
-    bool validationFsAps(const QString& saisieFS, const QString& saisieAPS, std::vector<int>& fs, std::vector<int>& aps);
-    /**
-     * @brief Méthode privée pour créer l'interface graphique
-     */
-    void createInterface();
-};
+bool validationFsAps(const QString& saisieFS, const QString& saisieAPS, std::vector<int>& fs, std::vector<int>& aps);
+
 #endif // FSAPSINPUT_H

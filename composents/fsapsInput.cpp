@@ -56,7 +56,23 @@ void fsapsInput::createInterface()
     connect(validateButton, &QPushButton::clicked, this, &fsapsInput::onValidate);
 }
 
-bool fsapsInput::validationFsAps(const QString& saisieFS, const QString& saisieAPS, std::vector<int>& fs, std::vector<int>& aps) {
+void fsapsInput::onValidate()
+{
+    std::vector<int> fs;
+    std::vector<int> aps;
+
+    // Vérifier la saisie des tableaux FS et APS
+    if (!validationFsAps(d_inputFS->text(), d_inputAPS->text(), fs, aps)) {
+        return; // Sortir de la méthode si la saisie est invalide
+    }
+
+    // Construire le graphe à partir de FS et APS
+    graphalgo::graph g{fs, aps};
+
+    emit graphe(g);
+}
+
+bool validationFsAps(const QString& saisieFS, const QString& saisieAPS, std::vector<int>& fs, std::vector<int>& aps) {
     // Vérifier la saisie du tableau FS
     QStringList nombresFS = saisieFS.split(" ", Qt::SkipEmptyParts);
     if (nombresFS.isEmpty()) {
@@ -101,20 +117,4 @@ bool fsapsInput::validationFsAps(const QString& saisieFS, const QString& saisieA
     }
 
     return true;
-}
-
-void fsapsInput::onValidate()
-{
-    std::vector<int> fs;
-    std::vector<int> aps;
-
-    // Vérifier la saisie des tableaux FS et APS
-    if (!validationFsAps(d_inputFS->text(), d_inputAPS->text(), fs, aps)) {
-        return; // Sortir de la méthode si la saisie est invalide
-    }
-
-    // Construire le graphe à partir de FS et APS
-    graphalgo::graph g(fs, aps);
-
-    emit graphe(g);
 }
