@@ -160,6 +160,7 @@ namespace graphalgo
 
             vector<vector<int>> cost_matrice() const;
             void save(std::ostream& ost) const;
+            void load(std::istream& ist);
 
         private:
             // nb of node

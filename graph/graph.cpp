@@ -1,5 +1,7 @@
 #include "graph.h"
 #include <algorithm>
+#include <string>
+#include <sstream>
 
 namespace graphalgo
 {
@@ -420,22 +422,47 @@ namespace graphalgo
 
     void graph::save(std::ostream& ost) const
     {
-        ost << d_n << "" << d_oriented << std::endl;
+        ost << d_n << " " << d_oriented << std::endl;
         
         node* crt = d_tete;
 
         while(crt)
         {
-            ost << crt->d_n;
 
             node* crt_ct = crt->d_next_s;
             while(crt_ct)
             {
-                ost << " " << crt_ct->d_next_m->d_n << "-" << crt_ct->d_n;
+                ost << crt->d_n << " " << crt_ct->d_next_m->d_n << "-" << crt_ct->d_n;
                 crt_ct = crt_ct->d_next_s;
+                ost << std::endl;
             }
-
             crt = crt->d_next_m;
         }
     }
+
+        void graph::load(std::istream& ist)
+        {
+            ist >> d_n >> d_oriented;
+
+            if(d_n > 0)
+            {
+                d_tete = new node(1);
+                node *crt = d_tete;
+                for(int i = 2; i <= d_n; ++i)
+                {
+                    crt->d_next_m = new node(i);
+                    crt = crt->d_next_m;
+                }
+
+                std::string line;
+                while ( std::getline(ist, line ) ) {
+                    std::istringstream li( line);
+                    int s, ss, cost;
+                    char c;
+                    
+                    li >> s >> ss >> c >> cost;
+                    add_successor(s, ss, cost);
+                }
+            }
+        }
 }
