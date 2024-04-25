@@ -74,7 +74,7 @@ void matAdjInput::createInterface()
         bool ok;
         unsigned value = text.toUInt(&ok);
 
-        if (ok) onNbSommets(value);
+        if(ok) onNbSommets(value);
     });
     connect(bValide, &QPushButton::clicked, this, &matAdjInput::createGraph);
 }
@@ -110,9 +110,20 @@ bool matAdjInput::recupereValide(std::vector<std::vector<int>> &matAdj) const
     bool valide = true;
     int nbLignes = d_matrice->rowCount();
 
-    // On alloue le tableau
+    // On alloue et prépare la matrice
     matAdj.clear();
-    matAdj.resize(nbLignes, std::vector<int>(nbLignes));
+    matAdj.resize(nbLignes + 1, std::vector<int>(nbLignes + 1, 0));
+    matAdj[0][0] = nbLignes;
+
+    // On initialise un compteur
+    int compt = 0;
+
+    std::vector<std::vector<QString>> test(nbLignes);
+    for(int i = 0; i < nbLignes; i++){
+        for(int j = 0; j < nbLignes; j++){
+            test[i].push_back(d_matrice->item(i, j)->text());
+        }
+    }
 
     // On fait défiler les lignes
     int i = 0;
@@ -120,17 +131,25 @@ bool matAdjInput::recupereValide(std::vector<std::vector<int>> &matAdj) const
         // On fait défiler les colonnes
         int j = 0;
         while(valide && j < nbLignes){
-            bool isNumber;
             // On récupère la valeur de la case
-            int number = d_matrice->item(i, j)->text().toInt(&isNumber);
-            if (!isNumber || number < 0)
+            bool isNumber;
+            unsigned number = d_matrice->item(i, j)->text().toUInt(&isNumber);
+
+            // On vérifie que la case est valide
+            if (!isNumber){
                 valide = false;
-            else
-                matAdj[i][j] = number;
+            } else if(number != 0) {
+                // On compte les arrêtes
+                compt++;
+                // on implémente les données
+                matAdj[i + 1][j + 1] = number;
+            }
             j++;
         }
         i++;
     }
+    // On implémente le nombre d'arrêtes
+    matAdj[0][1] = compt;
     // On retourne la validation
     return valide;
 }
@@ -141,18 +160,16 @@ void matAdjInput::createGraph()
     // générér le graph selon un tableau 2D d'entier
     std::vector<std::vector<int>> matAdj;
     if(recupereValide(matAdj)){
-        // On construit le graph
-        graphalgo::graph *g;
         // Graph orienté
-        if(d_radioButtonOriente->isChecked())
-            g = new graphalgo::graph{matAdj};
-        //Graph non-orienté
-        else
-            g = new graphalgo::graph{matAdj};
+        if(d_radioButtonOriente->isChecked()){
+            graphalgo::graph g{matAdj};
+            emit graphe(g);
 
-        // On retourne le graph
-        graphe(*g);
-        this->close();
+        // Graph non-orienté
+        }  else {
+            graphalgo::graph g{matAdj};
+            emit graphe(g);
+        }
     } else {
         QMessageBox::critical(nullptr, "Erreur de saisie", "La matrice d'adjacence est invalide.");
     }
