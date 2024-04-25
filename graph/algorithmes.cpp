@@ -208,69 +208,6 @@ pair<vector<int>, vector<int>> Dijkstra(int s, const vector<int>& fs, const vect
     return make_pair(pred, d);
 }
 
-<<<<<<< HEAD
-vector<vector<int>> dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout)
-{
-    int i, j, k;
-    // Récupère le nombre de nœuds du graphe
-    int n = matriceAdj[0][0];
-    vector<vector<int>> tabDantzig(n, vector<int>(n));
-
-    // Initialisation de la matrice des coûts
-    for (i = 0; i < n; i++)
-    {
-        for (j = 0; j < n; j++)
-        {
-            if (matriceAdj[i][j+1] != 0)
-                tabDantzig[i][j] = matriceCout[i][j+1];
-            else
-                // Valeur arbitrairement grande pour représenter l'infini
-                tabDantzig[i][j] = __INT_MAX__;
-        }
-        // Valeur spéciale pour indiquer la diagonale de la matrice
-        tabDantzig[i][i] = -__INT_MAX__;
-    }
-
-    // On représente la distance minimal afin de verifier la distance minimal
-    int t = tabDantzig[2][1] + tabDantzig[1][2];
-    for (k = 1; k < n - 1; k++)
-    {
-        for (i = 0; i <= k; i++)
-        {
-            for (j = 0; j <= k; j++)
-            {
-                int temp = tabDantzig[i][j] + tabDantzig[j][k+1];
-                if(tabDantzig[i][k+1] > temp && i != j && j != k+1)
-                    tabDantzig[i][k+1] = temp;
-
-                temp = tabDantzig[k+1][j] + tabDantzig[j][i];
-                if (tabDantzig[k+1][i] > temp && i != j && j != k+1)
-                    tabDantzig[k+1][i] = temp;
-            }
-            int temp = tabDantzig[k+1][j] + tabDantzig[j][k+1];
-            if (t > temp && j != k+1)
-                t = temp;
-
-            // S'il y a un circuit absorbant, retourne un message d'erreur
-            if (t < 0)
-                return {};
-
-        }
-        for (i = 0; i <= k; i++)
-        {
-            for (j = 0; j <= k; j++)
-            {
-                int temp = tabDantzig[i][k+1] + tabDantzig[k+1][j];
-                if (tabDantzig[i][j] > temp && k+1 != j && j != k+1)
-                    tabDantzig[i][j] = temp;
-            }
-        }
-    }
-    return tabDantzig;
-}
-
-=======
->>>>>>> origin/Daavid
 void fusion(int s, int t, vector<int>& prem, vector<int>& pilch, vector<int>& cfc) {
     int cs = cfc[s];
     int ct = cfc[t];
