@@ -74,7 +74,7 @@ vector<int> rang(const vector<int>& fs, const vector<int>& aps) {
     pilch[0] = 0;
     for(sommetCourant = 1; sommetCourant <= nbSommets; sommetCourant++)
         if(ddi[sommetCourant] == 0)
-            graphalgo::empiler(sommetCourant, pilch);
+            empiler(sommetCourant, pilch);
 
     r = -1;
     sommetCourant = pilch[0];
@@ -152,7 +152,6 @@ vector<int> prufer(const vector<vector<int>>& a) {
     return prf;
 }
 
-
 pair<vector<int>, vector<int>> Dijkstra(int s, const vector<int>& fs, const vector<int>& aps, const vector<vector<int>>& C) {
     int v, j, minDist;
     int nbSommet = aps[0];
@@ -209,6 +208,66 @@ pair<vector<int>, vector<int>> Dijkstra(int s, const vector<int>& fs, const vect
     return make_pair(pred, d);
 }
 
+vector<vector<int>> dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout)
+{
+    int i, j, k;
+    // Récupère le nombre de nœuds du graphe
+    int n = matriceAdj[0][0];
+    vector<vector<int>> tabDantzig(n, vector<int>(n));
+
+    // Initialisation de la matrice des coûts
+    for (i = 0; i < n; i++)
+    {
+        for (j = 0; j < n; j++)
+        {
+            if (matriceAdj[i][j+1] != 0)
+                tabDantzig[i][j] = matriceCout[i][j+1];
+            else
+                // Valeur arbitrairement grande pour représenter l'infini
+                tabDantzig[i][j] = __INT_MAX__;
+        }
+        // Valeur spéciale pour indiquer la diagonale de la matrice
+        tabDantzig[i][i] = -__INT_MAX__;
+    }
+
+    // On représente la distance minimal afin de verifier la distance minimal
+    int t = tabDantzig[2][1] + tabDantzig[1][2];
+    for (k = 1; k < n - 1; k++)
+    {
+        for (i = 0; i <= k; i++)
+        {
+            for (j = 0; j <= k; j++)
+            {
+                int temp = tabDantzig[i][j] + tabDantzig[j][k+1];
+                if(tabDantzig[i][k+1] > temp && i != j && j != k+1)
+                    tabDantzig[i][k+1] = temp;
+
+                temp = tabDantzig[k+1][j] + tabDantzig[j][i];
+                if (tabDantzig[k+1][i] > temp && i != j && j != k+1)
+                    tabDantzig[k+1][i] = temp;
+            }
+            int temp = tabDantzig[k+1][j] + tabDantzig[j][k+1];
+            if (t > temp && j != k+1)
+                t = temp;
+
+            // S'il y a un circuit absorbant, retourne un message d'erreur
+            if (t < 0)
+                return {};
+
+        }
+        for (i = 0; i <= k; i++)
+        {
+            for (j = 0; j <= k; j++)
+            {
+                int temp = tabDantzig[i][k+1] + tabDantzig[k+1][j];
+                if (tabDantzig[i][j] > temp && k+1 != j && j != k+1)
+                    tabDantzig[i][j] = temp;
+            }
+        }
+    }
+    return tabDantzig;
+}
+
 void fusion(int s, int t, vector<int>& prem, vector<int>& pilch, vector<int>& cfc) {
     int cs = cfc[s];
     int ct = cfc[t];
@@ -243,32 +302,18 @@ void kruskal(const graphalgo::graph& G, graphalgo::graph& T) {
     pilch[0] = 0;
 
     // Stockage des arêtes avec leur poids
-    vector<graphalgo::vtx> aretes;
-    // Récupération de toutes les arêtes du graphe G
-    for(int i = 1; i <= nbSommets; i++) {
-        // On récupère le successeur
-        graphalgo::node* crt = &G.find(i)->next_s();
-        // Tant qu'il y a des successeurs, on crée les arêtes correspondantes
-        while(crt) {
-            aretes.emplace_back(crt->n(), std::make_pair(i, crt->next_m().n()));
-            crt = &crt->next_s();
-        }
-    }
-
-    // On trie les arêtes par poids croissant
-    sort(aretes.begin(), aretes.end());
+    vector<graphalgo::vtx> aretes = G.vertexes();
 
     int k = 0;
     for(const auto& a : aretes) {
         // On récupère les extrémités de l'arête
-        int s = a.second.first;
-        int t = a.second.second;
+        int s = a.s;
+        int t = a.t;
         if(cfc[s] != cfc[t]) {
             // Ajouter le successeur si on n'a pas de circuit (même CFC)
-            T.add_successor(s, t, a.first);
+            T.add_successor(s, t, a.p);
             fusion(s, t, prem, pilch, cfc);
             k++;
-
             // On s'arrête quand l'arbre couvrant est complet
             if(k == nbSommets - 1) break;
         }
