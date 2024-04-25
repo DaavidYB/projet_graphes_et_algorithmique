@@ -5,6 +5,7 @@
 #ifndef PROJETGRAPHE_ALGORITHMES_H
 #define PROJETGRAPHE_ALGORITHMES_H
 
+#include "graph.h"
 #include <vector>
 
 using std::vector, std::pair;
@@ -51,8 +52,8 @@ namespace graphalgo{
      * @param matriceAdj La matrice d'adjacence
      * @param matriceCout La matrice des coûts associée
      */
-    void dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout);
-    void kruskal();
+    vector<vector<int>> dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout);
+    void kruskal(const graphalgo::graph& G, graphalgo::graph& T);
     /**
      * @brief Fonction retournant le codage de Prufer d'un arbre donné par sa matrice d'adjacence.
      * @param a La matrice d'adjacence représentant l'arbre.

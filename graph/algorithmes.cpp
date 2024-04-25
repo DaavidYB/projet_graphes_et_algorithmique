@@ -5,12 +5,12 @@
 #include "algorithmes.h"
 #include "graph.h"
 
-void empiler(int x, vector<int>& pilch) {
+void graphalgo::empiler(int x, vector<int>& pilch) {
     pilch[x] = pilch[0];
     pilch[0] = x;
 }
 
-vector<int> distance(int sommet, const vector<int>& fs, const vector<int>& aps){
+vector<int> graphalgo::distance(int sommet, const vector<int>& fs, const vector<int>& aps){
     // On déclare une variable contenant le nombre de sommets du graph
     int nbSommets = aps[0];
     // Déclaration des variables de début et fin du bloc en cours de traitement
@@ -59,7 +59,7 @@ vector<int> distance(int sommet, const vector<int>& fs, const vector<int>& aps){
     return distance;
 }
 
-vector<int> rang(const vector<int>& fs, const vector<int>& aps) {
+vector<int> graphalgo::rang(const vector<int>& fs, const vector<int>& aps) {
     // On déclare les variables tampons
     int nbSommets = aps[0], tailleFS = fs[0], sommetCourant, r, indiceSuccesseur, successeur;
     // On initialise le tableau de rangs
@@ -69,6 +69,13 @@ vector<int> rang(const vector<int>& fs, const vector<int>& aps) {
     vector<int> ddi (nbSommets + 1, 0); // Degré entrant de chaque sommet
     vector<int> pilch (nbSommets + 1); // Pile des sommets sans prédécesseurs
     vector<int> prem (nbSommets + 1); // Tableau des premiers sommets de chaque rang
+
+    // AJOUT
+    for(int i = 0; i < tailleFS; i++) {
+        int sommet = fs[i];
+        if(sommet > 0)
+            ddi[sommet]++;
+    }
 
     // On calcule le rang
     pilch[0] = 0;
@@ -116,12 +123,12 @@ vector<int> rang(const vector<int>& fs, const vector<int>& aps) {
         sommetCourant = pilch[0];
         prem[r + 1] = sommetCourant;
     }
-
+    rang[0] = aps[0];
     // On retourne le vecteur de rangs calculé
     return rang;
 }
 
-vector<int> prufer(const vector<vector<int>>& a) {
+vector<int> graphalgo::prufer(const vector<vector<int>>& a) {
     int nbSommets = a[0][0];
     // Création du vecteur pour stocker le codage de Prufer
     vector<int> prf (nbSommets - 1);
@@ -152,7 +159,7 @@ vector<int> prufer(const vector<vector<int>>& a) {
     return prf;
 }
 
-pair<vector<int>, vector<int>> Dijkstra(int s, const vector<int>& fs, const vector<int>& aps, const vector<vector<int>>& C) {
+pair<vector<int>, vector<int>> graphalgo::dijsktra(int s, const vector<int>& fs, const vector<int>& aps, const vector<vector<int>>& C) {
     int v, j, minDist;
     int nbSommet = aps[0];
     // Vecteurs pour stocker les distances minimales et les prédécesseurs
@@ -208,7 +215,7 @@ pair<vector<int>, vector<int>> Dijkstra(int s, const vector<int>& fs, const vect
     return make_pair(pred, d);
 }
 
-vector<vector<int>> dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout)
+vector<vector<int>> graphalgo::dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout)
 {
     int i, j, k;
     // Récupère le nombre de nœuds du graphe
@@ -268,7 +275,7 @@ vector<vector<int>> dantzig(const vector<vector<int>> &matriceAdj, const vector<
     return tabDantzig;
 }
 
-void fusion(int s, int t, vector<int>& prem, vector<int>& pilch, vector<int>& cfc) {
+void graphalgo::fusion(int s, int t, vector<int>& prem, vector<int>& pilch, vector<int>& cfc) {
     int cs = cfc[s];
     int ct = cfc[t];
     int x = prem[ct];
@@ -283,7 +290,7 @@ void fusion(int s, int t, vector<int>& prem, vector<int>& pilch, vector<int>& cf
     pilch[x] = prem[ct];
 }
 
-void kruskal(const graphalgo::graph& G, graphalgo::graph& T) {
+void graphalgo::kruskal(const graphalgo::graph& G, graphalgo::graph& T) {
     int nbSommets = G.n();
     // Initialiser T avec le même nombre de noeuds et orientation que G
     T = graphalgo::graph(nbSommets, G.oriented());

@@ -3,13 +3,13 @@
 #include "composents/vertexinput.h"
 #include "composents/matadjinput.h"
 #include "composents/graphview.h"
+#include <QScreen>
 #include <QWidget>
 #include <QBoxLayout>
 #include <QComboBox>
 #include <QPushButton>
 #include <QButtonGroup>
 #include <QList>
-#include <QLabel>
 #include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
@@ -19,7 +19,7 @@
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
-    this->createInterface();
+    createInterface();
 }
 
 MainWindow::~MainWindow()
@@ -39,6 +39,11 @@ MainWindow::~MainWindow()
 
 void MainWindow::createInterface()
 {
+    QScreen *screen = QGuiApplication::primaryScreen();
+    QRect  screenGeometry = screen->geometry();
+    int height = screenGeometry.height();
+    int width = screenGeometry.width();
+    setMinimumSize(width -600, height- 200);
     // On crée le widget principal
     auto mainWidget {new QWidget{this}};
     this->setCentralWidget(mainWidget);
@@ -48,9 +53,7 @@ void MainWindow::createInterface()
     mainWidget->setLayout(mainVerticalLayout);
 
     // Ajout du widget de graph
-    // auto futurGraph {new QLabel{"Furtur Widget Graph"}};
-    // mainVerticalLayout->addWidget(futurGraph);
-    d_graphview = new graphView{};
+    d_graphview = new graphView{d_graph};
     mainVerticalLayout->addWidget(d_graphview);
 
     // On crére et implémente le layout horithal

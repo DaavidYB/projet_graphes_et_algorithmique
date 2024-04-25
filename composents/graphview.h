@@ -8,6 +8,32 @@
 #include <QPainter>
 #include <QPoint>
 
+class graphNode{
+public :
+    graphNode(int index, QPoint coordonnees);
+
+    /**
+     * @brief Méthode publique retournant l'indice du Noeud
+     * @return
+     */
+    int indice() const;
+    /**
+     * @brief Méthode publique retournant les coordonnées du Noeud
+     * @return
+     */
+    QPoint coordonnees() const;
+
+private :
+    /**
+     * @brief L'indice du Noeud
+     */
+    int d_index;
+    /**
+     * @brief Les coordonnées du Noeud
+     */
+    QPoint d_coordonnee;
+};
+
 /**
  * @brief QWidget affaichant la représentation graphique d'un graphalgo::graph
  */
@@ -15,7 +41,7 @@ class graphView : public QWidget
 {
     Q_OBJECT
 public:
-    explicit graphView(QWidget *parent = nullptr);
+    explicit graphView(graphalgo::graph &g, QWidget *parent = nullptr);
     ~graphView();
 
     /**
@@ -26,27 +52,17 @@ public:
 
 private :
     /**
-     * @brief Structure privé stockant les coordonnées des points formant une arete ainsi que le coût de cette denière
-     */
-    struct arete{
-        /**
-         * @brief Les points représentant les Noeuds du graph
-         */
-        QPoint *p1, *p2;
-        /**
-         * @brief Le coût de l'arete
-         */
-        int cout;
-    };
-
-    /**
      * @brief La liste des Noeuds du graph
      */
-    std::vector<QPoint*> listeNoeuds;
+    std::vector<graphNode> d_listeNoeuds;
+    vector<int>fs, aps;
+
     /**
-     * @brief La liste des aretes du graph
+     * @brief Méthode privée retournant le Noeud d'indice saisi
+     * @param index L'indice en question
+     * @return
      */
-    std::vector<arete*> listeAretes;
+    graphNode find(int index) const;
 
 private :
     /**
@@ -54,32 +70,41 @@ private :
      */
     void paintEvent(QPaintEvent *) override;
 
-
-    // Calcul des positions
-
     /**
      * @brief Méthode privée traçant un noeud
      * @param p Les coordonnées du Noeud
      * @param index Le numéro du Noeud
      */
-    void dessineNoeud(QPainter &painter, const QPoint &p, int index);
+    void dessineNoeud(QPainter &painter, const graphNode &node);
     /**
      * @brief dessineArete Méthode privée reliant deux noeuds dans l'interface
      * @param noeud1 Le premier Noeud
      * @param noeud2 Le second
      * @param oriented Booléen indiquant si le graph est orienté
      */
-    void dessineArete(QPainter &painter, const QPoint &noeud1, const QPoint &noeud2, int cout, bool oriented = false);
+    void dessineArete(QPainter &painter, const graphNode &node1, const graphNode &node2,
+                      int cout = __INT_MAX__, bool oriented = false);
+
+    /**
+     * @brief Méthode calculant les coordonnées des Noeuds du graph à l'aide du tableau de rang de ces denriers
+     * @param rang Le tableau des rangs
+     * @return
+     */
+    std::vector<graphNode> calculePositions(const std::vector<int> &rang);
 
     /**
      * @brief Méthode générant la représentation graphique d'un graph
      * @param g Le graph à illustrer
      */
-    void dessineGraph(const graphalgo::graph &g);
+    // void dessineGraph(QPainter &painter, graphalgo::graph &g);
+    void dessineGraph(QPainter &painter);
+
+private slots :
     /**
-     * @brief Méthode effaçant les QPoint représentant le graph
+     * @brief Méthode privée réagissant à la modification du graph courant de l'application
+     * @param g Le graph courant
      */
-    void effaceGraph();
+    void graphChanged(graphalgo::graph &g);
 };
 
 #endif // GRAPHVIEW_H

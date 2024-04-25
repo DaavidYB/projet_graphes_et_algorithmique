@@ -1,62 +1,96 @@
 #include "graphview.h"
+#include "../graph/algorithmes.h"
 
 // CONSTRUCTEURS
 
-graphView::graphView(QWidget *parent)
+graphNode::graphNode(int index, QPoint coordonnees)
+    : d_index{index}, d_coordonnee{coordonnees}
+{
+}
+
+// GETTERS
+
+int graphNode::indice() const
+{
+    return d_index;
+}
+
+QPoint graphNode::coordonnees() const
+{
+    return d_coordonnee;
+}
+
+// CONSTRUCTEURS
+
+graphView::graphView(graphalgo::graph &g, QWidget *parent)
     : QWidget{parent}
 {
-    //
+    g.fs_aps(fs, aps);
 }
 
 graphView::~graphView()
 {
-    // delete les pointeurs
 }
 
 // CRÉATION DE L'INTERFACE
 
 QSize graphView::sizeHint() const
 {
-    return {800, 600};
+    return {600, 800};
 }
 
-
-// !! MÉTHODE TEMPORAIRE À SUPPRIMER !! //
 void graphView::paintEvent(QPaintEvent *)
 {
     QPainter painter{this};
     painter.setRenderHint(QPainter::Antialiasing);
+    painter.fillRect(0, 0, width(), height(), Qt::white);
+    dessineGraph(painter);
+}
 
+// MÉTHODE BACK-END
 
-    QPoint p1{200, 200}, p2{400, 300};
-    dessineNoeud(painter, p1, 3);
-    dessineNoeud(painter, p2, 12);
-    dessineArete(painter, p1, p2, 1, true);
+graphNode graphView::find(int index) const
+{
+    // On initialise les variables tampons
+    bool estTrouve = false;
+    unsigned i = 0;
+    // On déroule la liste
+    while(!estTrouve && i < d_listeNoeuds.size()) {
+        // On compare
+        if(d_listeNoeuds[i].indice() == index)
+            estTrouve = true;
+        // On incrémente
+        else i++;
+    }
+    // On retourne le Noeud
+    return d_listeNoeuds[i];
 }
 
 // MÉTHODES DE DESSIN
 
-void graphView::dessineNoeud(QPainter &painter, const QPoint &p, int index)
+void graphView::dessineNoeud(QPainter &painter, const graphNode &node)
 {
     // Dessiner le cercle en noir
     painter.setBrush(Qt::black);
-    painter.drawEllipse(p, 20, 20);
+    painter.drawEllipse(node.coordonnees(), 10, 10);
 
     // Dessiner le numéro du nœud en blanc
     painter.setPen(Qt::white);
-    painter.drawText(p - QPoint(index > 9 ? 7 : 4, -5), QString::number(index));
+    // On centre le numéro de l'item
+    painter.drawText(node.coordonnees() - QPoint(node.indice() > 9 ? 7 : 4, -5), QString::number(node.indice()));
 }
 
-void graphView::dessineArete(QPainter &painter, const QPoint &noeud1, const QPoint &noeud2, int cout, bool oriented)
+void graphView::dessineArete(QPainter &painter, const graphNode &node1,
+                             const graphNode &node2, int cout, bool oriented)
 {
     // Calcul des vecteurs directeurs des arêtes
-    QPoint direction = noeud2 - noeud1;
+    QPoint direction = node2.coordonnees() - node1.coordonnees();
     double distance = std::sqrt(direction.x() * direction.x() + direction.y() * direction.y());
     direction /= distance;
 
     // Calcul des points de départ et d'arrivée sur le bord des cercles
-    QPoint depart = noeud1 + direction * 20;
-    QPoint arrivee = noeud2 - direction * 20;
+    QPoint depart = node1.coordonnees() + direction * 20;
+    QPoint arrivee = node2.coordonnees() - direction * 20;
 
     // On trace la ligne en noir
     painter.setPen(Qt::black);
@@ -66,10 +100,8 @@ void graphView::dessineArete(QPainter &painter, const QPoint &noeud1, const QPoi
     // On teste si le cout est renseigné
     if(cout != __INT_MAX__)
     {
-        // On calcule les coordonnées du cout
-        QPoint milieu {static_cast<int>((depart.x() + arrivee.x()) / 2.0),
-                      static_cast<int>((depart.y() + arrivee.y()) / 2.0)};
-        // On dessine le cout
+        // On calcule les coordonnées du cout et on le dessine
+        QPoint milieu {(depart + arrivee) / 2};
         painter.drawText(milieu, QString::number(cout));
     }
 
@@ -89,16 +121,87 @@ void graphView::dessineArete(QPainter &painter, const QPoint &noeud1, const QPoi
     }
 }
 
-
-void graphView::dessineGraph(const graphalgo::graph &g)
+std::vector<graphNode> graphView::calculePositions(const std::vector<int> &rang)
 {
-    // On déclare notre peintre
-    QPainter painter{this};
-    // On active l'anticrénelage
-    painter.setRenderHint(QPainter::Antialiasing);
+    // Vector résultat contenant les coordonnées des Noeuds
+    std::vector<graphNode> listeNoeuds;
+    // On récupère le nombre de rang
+    int nbRang = *std::max_element(rang.begin() + 1, rang.end()) + 1;
+    // On calcule le gap entre les Noeuds
+    int largeur = (width() - 40) / (nbRang + 2);
+
+    vector<int> hauteurs(nbRang + 2, 0);
+    // On compte le nombre d'items de chaque rang
+    for(int i = 1; i <= rang[0]; i++)
+        if(rang[i] >= 0) {
+            hauteurs[rang[i]]++;
+        } else {
+            hauteurs[nbRang + 1]++;
+        }
+    // On déduit le gap entre chaque groupe d'items (selon leur rang)
+    for(unsigned i = 0; i < hauteurs.size(); i++)
+        hauteurs[i] = height() / (hauteurs[i] + 1);
+
+    // On alloue un compteur d'items pour chaque rang
+    vector<int> nbItemsRang(nbRang + 2, 0);
+    for(int i = 1; i <= rang[0]; i++) {
+        // On récupère le rang
+        int r = rang[i];
+        if(r >= 0){
+            nbItemsRang[r]++;
+            // On consrtuit le Noeud
+            QPoint p{(r + 1) * largeur, (nbItemsRang[r]) * hauteurs[r]};
+            graphNode node{static_cast<int>(i), p};
+            listeNoeuds.push_back(node);
+        } else {
+            nbItemsRang[nbRang + 1]++;
+            QPoint p{(nbRang + 1) * largeur, (nbItemsRang[nbRang + 1]) * hauteurs[nbRang + 1]};
+            graphNode node{static_cast<int>(i), p};
+            listeNoeuds.push_back(node);
+        }
+    }
+    return listeNoeuds;
 }
 
-void graphView::effaceGraph()
+void graphView::dessineGraph(QPainter &painter)
 {
+    // On récupère le rang des sommets
+    vector<int> rang = graphalgo::rang(fs, aps);
 
+    // Récupérer les positions des nœuds
+    d_listeNoeuds = calculePositions(rang);
+
+    // On dessine les nœuds
+    for(const auto item : d_listeNoeuds)
+        dessineNoeud(painter, item);
+
+    // On récupére les arêtes du graphe
+    const graphalgo::graph g{fs, aps};
+    std::vector<graphalgo::vtx> vtxs = g.vertexes();
+
+    // On dessine les arêtes
+    for (const auto& v : vtxs) {
+        int s = v.s - 1;
+        int t = v.t - 1;
+        dessineArete(painter, d_listeNoeuds[s], d_listeNoeuds[t], v.p, g.oriented());
+    }
+
+    // graphNode node1{1, {200, 200}};
+    // graphNode node2{2, {400, 400}};
+    // dessineNoeud(painter, node1);
+    // dessineNoeud(painter, node2);
+    // dessineArete(painter, node1, node2);
+}
+
+void graphView::graphChanged(graphalgo::graph &g)
+{
+    // On libère la mémoire allouée
+    d_listeNoeuds.clear();
+
+    // On libère les tableaux de données et on implémente les nouvelles données
+    fs.clear();
+    aps.clear();
+    g.fs_aps(fs, aps);
+    // On redessine le QWidget
+    update();
 }
