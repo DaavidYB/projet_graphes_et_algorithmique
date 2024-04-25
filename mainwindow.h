@@ -7,11 +7,6 @@
 
 class QComboBox;
 class QPushButton;
-class graphView;
-
-/**
- * @brief The MainWindow class
- */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -26,7 +21,7 @@ private:
      * @brief Le graph courant qui s'affiche
      */
     graphalgo::graph d_graph;
-
+    // QWidget perso -> affiche le graph
     /**
      * @brief La liste des algorithmes
      */
@@ -44,15 +39,10 @@ private:
      */
     QWidget* d_currentInputWindow = nullptr;
 
-private :
     /**
      * @brief Méthode privée générant les composants de la mainWindow
      */
     void createInterface();
-    /**
-     * @brief QWidget affichant la représentation graphique de d_graph
-     */
-    graphView *d_graphview;
     /**
      * @brief Méthode privée montrant les sous-options de saisies textuelles
      */

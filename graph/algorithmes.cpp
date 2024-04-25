@@ -208,6 +208,7 @@ pair<vector<int>, vector<int>> Dijkstra(int s, const vector<int>& fs, const vect
     return make_pair(pred, d);
 }
 
+<<<<<<< HEAD
 vector<vector<int>> dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout)
 {
     int i, j, k;
@@ -268,6 +269,8 @@ vector<vector<int>> dantzig(const vector<vector<int>> &matriceAdj, const vector<
     return tabDantzig;
 }
 
+=======
+>>>>>>> origin/Daavid
 void fusion(int s, int t, vector<int>& prem, vector<int>& pilch, vector<int>& cfc) {
     int cs = cfc[s];
     int ct = cfc[t];

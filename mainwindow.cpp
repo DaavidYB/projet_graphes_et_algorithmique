@@ -2,7 +2,6 @@
 #include "composents/fsapsInput.h"
 #include "composents/vertexinput.h"
 #include "composents/matadjinput.h"
-#include "composents/graphview.h"
 #include <QWidget>
 #include <QBoxLayout>
 #include <QComboBox>
@@ -13,6 +12,8 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
+
+#include <iostream>
 
 // CONSTRUCTEURS
 
@@ -48,10 +49,8 @@ void MainWindow::createInterface()
     mainWidget->setLayout(mainVerticalLayout);
 
     // Ajout du widget de graph
-    // auto futurGraph {new QLabel{"Furtur Widget Graph"}};
-    // mainVerticalLayout->addWidget(futurGraph);
-    d_graphview = new graphView{};
-    mainVerticalLayout->addWidget(d_graphview);
+    auto futurGraph {new QLabel{"Furtur Widget Graph"}};
+    mainVerticalLayout->addWidget(futurGraph);
 
     // On crére et implémente le layout horithal
     auto horizonthalLayout {new QHBoxLayout};
@@ -85,7 +84,7 @@ void MainWindow::createInterface()
     auto buttonDessin {new QPushButton{"Dessiner un nouveau graph"}};
     auto buttonSaisie {new QPushButton{"Saisie textuelle"}};
     auto buttonFichier {new QPushButton{"Télécharger un fichier"}};
-    auto buttonSauvegarder {new QPushButton{"Sauvegarder le graph"}};
+    auto buttonSauvegarder {new QPushButton{"Sauvegarderle graph"}};
 
     // On crée le layout contenant les sous-options de saisie textuelle
     auto buttonSaisieLayout {new QVBoxLayout{}};
@@ -287,8 +286,7 @@ void MainWindow::onSauvegarde()
     // Ouvrir une boîte de dialogue pour permettre à l'utilisateur de choisir le fichier
     QString fileName = QFileDialog::getSaveFileName(this, "Sauvegarder le graphe", "", "Fichiers texte (*.txt)");
     if(fileName.isEmpty()) {
-        // L'utilisateur a annulé la sauvegarde
-        return;
+        return; // L'utilisateur a annulé la sauvegarde
     }
 
     // Ouvrir le fichier en écriture
@@ -300,7 +298,6 @@ void MainWindow::onSauvegarde()
 
     // Récupérer les tableaux FS et APS
     std::vector<int> fs, aps;
-    std::vector<std::vector<int>> matAdj = d_graph.mat_adj();
     d_graph.fs_aps(fs, aps);
 
     // Écrire les tableaux FS et APS dans le fichier

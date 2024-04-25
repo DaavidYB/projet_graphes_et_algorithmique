@@ -46,12 +46,7 @@ namespace graphalgo{
      * @return Une paire de vecteurs contenant les prédécesseurs et les distances minimales de chaque sommet par rapport au sommet source.
      */
     pair<vector<int>, vector<int>> dijsktra(int s, const vector<int>& fs, const vector<int>& aps, const vector<vector<int>>& C);
-    /**
-     * @brief Fonction appliquant l'algorithme de dantzig.
-     * @param matriceAdj La matrice d'adjacence
-     * @param matriceCout La matrice des coûts associée
-     */
-    void dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout);
+    void dantzig();
     void kruskal();
     /**
      * @brief Fonction retournant le codage de Prufer d'un arbre donné par sa matrice d'adjacence.
