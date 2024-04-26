@@ -126,11 +126,11 @@ struct point{
     int x, y;
 };
 
-std::vector<graphNode> graphView::calculePositions()
+std::vector<graphNode> graphView::calculePositions(std::vector<graphalgo::vtx> vertex)
 {
     // On récupère les dimensions de l'écran
     int largeur = width() - 40, hauteur = height() - 40;
-    // On initialise notre générateur d'alétoire
+    // On initialise notre générateur d'aléatoire
     std::random_device rd;
     std::mt19937 gen(rd());
     std::uniform_int_distribution<> distX(40, largeur);
@@ -139,22 +139,41 @@ std::vector<graphNode> graphView::calculePositions()
     // Vector résultat contenant les coordonnées des Noeuds
     std::vector<graphNode> listeNoeuds;
     // On remplit la liste
-    // for(int i = 0; i < aps[0]; i++) {
     for(int i = 0; i < d_graph.n(); i++) {
         int x = distX(gen);
         int y = distY(gen);
-        // On génère le graphNode
-        listeNoeuds.push_back({i + 1, {x, y}});
+        graphNode node(i + 1, {x, y});
+
+        // On vérifie que le nœud ne chevauche pas une liaison existante
+        bool estValide = true;
+        for (const auto& v : vertex) {
+            int s = v.s - 1;
+            int t = v.t - 1;
+            if(listeNoeuds.size() > 0) {
+                QLineF ligne(listeNoeuds[s].coordonnees(), listeNoeuds[t].coordonnees());
+                if (ligne.intersects(QLineF(node.coordonnees() - QPoint(20, 20), node.coordonnees() + QPoint(20, 20)), nullptr) == QLineF::BoundedIntersection) {
+                    estValide = false;
+                    break;
+                }
+            }
+        }
+
+        if (estValide) {
+            listeNoeuds.push_back(node);
+        } else {
+            i--; // On réessaie une nouvelle position pour ce nœud
+        }
     }
+
     // On la retourne
     return listeNoeuds;
 }
 
-
 void graphView::dessineGraph(QPainter &painter)
 {
     // Récupérer les positions des nœuds
-    d_listeNoeuds = calculePositions();
+    // d_listeNoeuds = calculePositions();
+    d_listeNoeuds = calculePositions(d_graph.vertexes());
 
     // On dessine les nœuds
     for(const auto item : d_listeNoeuds)

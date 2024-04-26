@@ -94,8 +94,8 @@ private :
      * @param rang Le tableau des rangs
      * @return
      */
-    std::vector<graphNode> calculePositions();
-    // std::vector<graphNode> calculePositions(const std::vector<int> &rang);
+    std::vector<graphNode> calculePositions(std::vector<graphalgo::vtx> vertex);
+    // std::vector<graphNode> calculePositions();
 
     /**
      * @brief Méthode générant la représentation graphique d'un graph
