@@ -55,7 +55,11 @@ private :
      * @brief La liste des Noeuds du graph
      */
     std::vector<graphNode> d_listeNoeuds;
-    vector<int>fs, aps;
+    /**
+     * @brief Les tableaux FS et APS du graph à dessiner
+     */
+    // vector<int>fs, aps;
+    graphalgo::graph d_graph;
 
     /**
      * @brief Méthode privée retournant le Noeud d'indice saisi
@@ -90,7 +94,8 @@ private :
      * @param rang Le tableau des rangs
      * @return
      */
-    std::vector<graphNode> calculePositions(const std::vector<int> &rang);
+    std::vector<graphNode> calculePositions();
+    // std::vector<graphNode> calculePositions(const std::vector<int> &rang);
 
     /**
      * @brief Méthode générant la représentation graphique d'un graph

@@ -1,6 +1,6 @@
 #include "graphview.h"
-#include "../graph/algorithmes.h"
-#include "../mainwindow.h"
+#include <random>
+#include <QLineF>
 
 // CONSTRUCTEURS
 
@@ -24,9 +24,9 @@ QPoint graphNode::coordonnees() const
 // CONSTRUCTEURS
 
 graphView::graphView(graphalgo::graph &g, QWidget *parent)
-    : QWidget{parent}
+    : QWidget{parent}, d_graph{g}
 {
-    g.fs_aps(fs, aps);
+    // g.fs_aps(fs, aps);
 }
 
 graphView::~graphView()
@@ -122,69 +122,50 @@ void graphView::dessineArete(QPainter &painter, const graphNode &node1,
     }
 }
 
-std::vector<graphNode> graphView::calculePositions(const std::vector<int> &rang)
+struct point{
+    int x, y;
+};
+
+std::vector<graphNode> graphView::calculePositions()
 {
+    // On récupère les dimensions de l'écran
+    int largeur = width() - 40, hauteur = height() - 40;
+    // On initialise notre générateur d'alétoire
+    std::random_device rd;
+    std::mt19937 gen(rd());
+    std::uniform_int_distribution<> distX(40, largeur);
+    std::uniform_int_distribution<> distY(40, hauteur);
+
     // Vector résultat contenant les coordonnées des Noeuds
     std::vector<graphNode> listeNoeuds;
-    // On récupère le nombre de rang
-    int nbRang = *std::max_element(rang.begin() + 1, rang.end()) + 1;
-    // On calcule le gap entre les Noeuds
-    int largeur = (width() - 40) / (nbRang + 2);
-
-    vector<int> hauteurs(nbRang + 2, 0);
-    // On compte le nombre d'items de chaque rang
-    for(int i = 1; i <= rang[0]; i++)
-        if(rang[i] >= 0) {
-            hauteurs[rang[i]]++;
-        } else {
-            hauteurs[nbRang + 1]++;
-        }
-    // On déduit le gap entre chaque groupe d'items (selon leur rang)
-    for(unsigned i = 0; i < hauteurs.size(); i++)
-        hauteurs[i] = height() / (hauteurs[i] + 1);
-
-    // On alloue un compteur d'items pour chaque rang
-    vector<int> nbItemsRang(nbRang + 2, 0);
-    for(int i = 1; i <= rang[0]; i++) {
-        // On récupère le rang
-        int r = rang[i];
-        if(r >= 0){
-            nbItemsRang[r]++;
-            // On consrtuit le Noeud
-            QPoint p{(r + 1) * largeur, (nbItemsRang[r]) * hauteurs[r]};
-            graphNode node{static_cast<int>(i), p};
-            listeNoeuds.push_back(node);
-        } else {
-            nbItemsRang[nbRang + 1]++;
-            QPoint p{(nbRang + 1) * largeur, (nbItemsRang[nbRang + 1]) * hauteurs[nbRang + 1]};
-            graphNode node{static_cast<int>(i), p};
-            listeNoeuds.push_back(node);
-        }
+    // On remplit la liste
+    // for(int i = 0; i < aps[0]; i++) {
+    for(int i = 0; i < d_graph.n(); i++) {
+        int x = distX(gen);
+        int y = distY(gen);
+        // On génère le graphNode
+        listeNoeuds.push_back({i + 1, {x, y}});
     }
+    // On la retourne
     return listeNoeuds;
 }
 
+
 void graphView::dessineGraph(QPainter &painter)
 {
-    // On récupère le rang des sommets
-    vector<int> rang = graphalgo::rang(fs, aps);
-
     // Récupérer les positions des nœuds
-    d_listeNoeuds = calculePositions(rang);
+    d_listeNoeuds = calculePositions();
 
     // On dessine les nœuds
     for(const auto item : d_listeNoeuds)
         dessineNoeud(painter, item);
 
-    // On récupére les arêtes du graphe
-    const graphalgo::graph g{fs, aps};
-    std::vector<graphalgo::vtx> vtxs = g.vertexes();
-
-    // On dessine les arêtes
+    // On récupère les liaisons
+    std::vector<graphalgo::vtx> vtxs = d_graph.vertexes();
     for (const auto& v : vtxs) {
         int s = v.s - 1;
         int t = v.t - 1;
-        dessineArete(painter, d_listeNoeuds[s], d_listeNoeuds[t], v.p, g.oriented());
+        dessineArete(painter, d_listeNoeuds[s], d_listeNoeuds[t], v.p, d_graph.oriented());
     }
 }
 
@@ -192,11 +173,7 @@ void graphView::graphChanged(graphalgo::graph &g)
 {
     // On libère la mémoire allouée
     d_listeNoeuds.clear();
-
-    // On libère les tableaux de données et on implémente les nouvelles données
-    fs.clear();
-    aps.clear();
-    g.fs_aps(fs, aps);
+    d_graph = g;
     // On redessine le QWidget
     update();
 }
