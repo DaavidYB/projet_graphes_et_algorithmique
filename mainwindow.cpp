@@ -15,8 +15,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-#include <iostream>
-
 // CONSTRUCTEURS
 
 MainWindow::MainWindow(QWidget *parent)
@@ -32,6 +30,7 @@ MainWindow::~MainWindow()
     delete d_buttonLancerAlgo;
     delete d_saisieGroup;
     delete fichierGroup;
+    delete d_graphview;
     if (d_currentInputWindow) {
         d_currentInputWindow->close();
         delete d_currentInputWindow;
@@ -56,13 +55,12 @@ void MainWindow::createInterface()
     mainWidget->setLayout(mainVerticalLayout);
 
     // Ajout du widget de graph
-    d_graphview = new graphView{d_graph};
+    d_graphview = new graphView{d_graph, this};
     mainVerticalLayout->addWidget(d_graphview);
 
     // On crére et implémente le layout horithal
     auto horizonthalLayout {new QHBoxLayout};
     mainVerticalLayout->addLayout(horizonthalLayout);
-
 
     // On crée le QVBoxLayout contenant la liste des algorithmes
     auto listeAlgoLayout {new QVBoxLayout};
@@ -186,7 +184,7 @@ void MainWindow::onGrapheReceived(const graphalgo::graph& g)
 {
     // Mettre à jour l'affichage du graphe
     d_graph = g;
-    // Appel de la méthode pour mettre à jour l'affichage du graphe
+    d_graphview->graphChanged(d_graph);
 
     // Fermer la fenêtre de saisie
     if(d_currentInputWindow) {

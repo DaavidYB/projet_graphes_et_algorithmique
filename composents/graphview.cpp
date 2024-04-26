@@ -1,5 +1,6 @@
 #include "graphview.h"
 #include "../graph/algorithmes.h"
+#include "../mainwindow.h"
 
 // CONSTRUCTEURS
 
@@ -42,8 +43,8 @@ QSize graphView::sizeHint() const
 void graphView::paintEvent(QPaintEvent *)
 {
     QPainter painter{this};
-    painter.setRenderHint(QPainter::Antialiasing);
-    painter.fillRect(0, 0, width(), height(), Qt::white);
+    // painter.setRenderHint(QPainter::Antialiasing);
+    // painter.fillRect(0, 0, width(), height(), Qt::white);
     dessineGraph(painter);
 }
 

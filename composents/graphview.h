@@ -99,7 +99,7 @@ private :
     // void dessineGraph(QPainter &painter, graphalgo::graph &g);
     void dessineGraph(QPainter &painter);
 
-private slots :
+public slots :
     /**
      * @brief Méthode privée réagissant à la modification du graph courant de l'application
      * @param g Le graph courant
