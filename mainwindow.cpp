@@ -3,6 +3,7 @@
 #include "composents/vertexinput.h"
 #include "composents/matadjinput.h"
 #include "composents/graphview.h"
+#include <fstream>
 #include <QScreen>
 #include <QWidget>
 #include <QBoxLayout>
@@ -90,7 +91,7 @@ void MainWindow::createInterface()
     auto buttonDessin {new QPushButton{"Dessiner un nouveau graph"}};
     auto buttonSaisie {new QPushButton{"Saisie textuelle"}};
     auto buttonFichier {new QPushButton{"Télécharger un fichier"}};
-    auto buttonSauvegarder {new QPushButton{"Sauvegarderle graph"}};
+    auto buttonSauvegarder {new QPushButton{"Sauvegarder le graph"}};
 
     // On crée le layout contenant les sous-options de saisie textuelle
     auto buttonSaisieLayout {new QVBoxLayout{}};
@@ -302,21 +303,7 @@ void MainWindow::onSauvegarde()
         return;
     }
 
-    // Récupérer les tableaux FS et APS
-    std::vector<int> fs, aps;
-    d_graph.fs_aps(fs, aps);
-
-    // Écrire les tableaux FS et APS dans le fichier
-    QTextStream out(&file);
-    for(unsigned i = 0; i < fs.size() - 1; i++) {
-        out << fs[i] << " ";
-    }
-    out << fs[fs.size() - 1];
-    out << "\n";
-    for(unsigned i = 0; i < aps.size() - 1; i++) {
-        out << aps[i] << " ";
-    }
-    out << aps[aps.size() - 1];
-
+    std::ofstream ofs(fileName.toStdString());
+    d_graph.save(ofs);
     file.close();
 }

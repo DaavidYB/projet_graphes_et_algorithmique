@@ -440,29 +440,27 @@ namespace graphalgo
         }
     }
 
-        void graph::load(std::istream& ist)
+    void graph::load(std::istream& ist)
+    {
+        ist >> d_n >> d_oriented;
+        if(d_n > 0)
         {
-            ist >> d_n >> d_oriented;
-
-            if(d_n > 0)
+            d_tete = new node(1);
+            node *crt = d_tete;
+            for(int i = 2; i <= d_n; ++i)
             {
-                d_tete = new node(1);
-                node *crt = d_tete;
-                for(int i = 2; i <= d_n; ++i)
-                {
-                    crt->d_next_m = new node(i);
-                    crt = crt->d_next_m;
-                }
+                crt->d_next_m = new node(i);
+                crt = crt->d_next_m;
+            }
+            std::string line;
+            while ( std::getline(ist, line ) ) {
+                std::istringstream li( line);
+                int s, ss, cost;
+                char c;
 
-                std::string line;
-                while ( std::getline(ist, line ) ) {
-                    std::istringstream li( line);
-                    int s, ss, cost;
-                    char c;
-                    
-                    li >> s >> ss >> c >> cost;
-                    add_successor(s, ss, cost);
-                }
+                li >> s >> ss >> c >> cost;
+                add_successor(s, ss, cost);
             }
         }
+    }
 }

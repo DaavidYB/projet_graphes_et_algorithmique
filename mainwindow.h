@@ -4,6 +4,7 @@
 #include "graph/graph.h"
 #include <QMainWindow>
 #include <QButtonGroup>
+#include "composents/graphview.h"
 
 class QComboBox;
 class QPushButton;

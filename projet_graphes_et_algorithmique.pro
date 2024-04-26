@@ -12,6 +12,7 @@ SOURCES += \
     composents/fsapsInput.cpp \
     composents/matadjinput.cpp \
     composents/vertexinput.cpp \
+    composents/graphview.cpp \
     graph/algorithmes.cpp \
     graph/graph.cpp \
     main.cpp \
@@ -21,6 +22,7 @@ HEADERS += \
     composents/fsapsInput.h \
     composents/matadjinput.h \
     composents/vertexinput.h \
+    composents/graphview.h \
     graph/algorithmes.h \
     graph/graph.h \
     mainwindow.h
