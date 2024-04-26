@@ -7,11 +7,6 @@
 
 class QComboBox;
 class QPushButton;
-class graphView;
-
-/**
- * @brief The MainWindow class
- */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -48,7 +43,6 @@ private:
      */
     QWidget* d_currentInputWindow = nullptr;
 
-private :
     /**
      * @brief Méthode privée générant les composants de la mainWindow
      */

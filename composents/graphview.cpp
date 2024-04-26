@@ -185,12 +185,6 @@ void graphView::dessineGraph(QPainter &painter)
         int t = v.t - 1;
         dessineArete(painter, d_listeNoeuds[s], d_listeNoeuds[t], v.p, g.oriented());
     }
-
-    // graphNode node1{1, {200, 200}};
-    // graphNode node2{2, {400, 400}};
-    // dessineNoeud(painter, node1);
-    // dessineNoeud(painter, node2);
-    // dessineArete(painter, node1, node2);
 }
 
 void graphView::graphChanged(graphalgo::graph &g)

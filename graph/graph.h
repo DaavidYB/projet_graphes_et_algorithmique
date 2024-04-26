@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility>
 using std::vector;
+#include <iostream>
 
 namespace graphalgo
 {
@@ -158,6 +159,8 @@ namespace graphalgo
             vector<vtx> vertexes() const;
 
             vector<vector<int>> cost_matrice() const;
+            void save(std::ostream& ost) const;
+            void load(std::istream& ist);
 
         private:
             // nb of node

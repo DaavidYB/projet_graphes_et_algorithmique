@@ -14,6 +14,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include <iostream>
+
 // CONSTRUCTEURS
 
 MainWindow::MainWindow(QWidget *parent)
@@ -88,7 +90,7 @@ void MainWindow::createInterface()
     auto buttonDessin {new QPushButton{"Dessiner un nouveau graph"}};
     auto buttonSaisie {new QPushButton{"Saisie textuelle"}};
     auto buttonFichier {new QPushButton{"Télécharger un fichier"}};
-    auto buttonSauvegarder {new QPushButton{"Sauvegarder le graph"}};
+    auto buttonSauvegarder {new QPushButton{"Sauvegarderle graph"}};
 
     // On crée le layout contenant les sous-options de saisie textuelle
     auto buttonSaisieLayout {new QVBoxLayout{}};
@@ -290,8 +292,7 @@ void MainWindow::onSauvegarde()
     // Ouvrir une boîte de dialogue pour permettre à l'utilisateur de choisir le fichier
     QString fileName = QFileDialog::getSaveFileName(this, "Sauvegarder le graphe", "", "Fichiers texte (*.txt)");
     if(fileName.isEmpty()) {
-        // L'utilisateur a annulé la sauvegarde
-        return;
+        return; // L'utilisateur a annulé la sauvegarde
     }
 
     // Ouvrir le fichier en écriture
@@ -303,7 +304,6 @@ void MainWindow::onSauvegarde()
 
     // Récupérer les tableaux FS et APS
     std::vector<int> fs, aps;
-    std::vector<std::vector<int>> matAdj = d_graph.mat_adj();
     d_graph.fs_aps(fs, aps);
 
     // Écrire les tableaux FS et APS dans le fichier

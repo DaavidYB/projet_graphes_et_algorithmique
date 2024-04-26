@@ -1,8 +1,9 @@
 #include "doctest.h"
-#include "../graph.h"
+#include "../graph/graph.h"
 #include <vector>
 
 #include <iostream>
+#include <fstream>
 
 using std::vector;
 
@@ -17,8 +18,18 @@ TEST_CASE("[graph]")
 {
     vector<int> FS = {31, 2, 3, 0, 4, 9, 0, 4, 6, 8, 0, 8, 9, 11, 0, 3, 6, 0, 7, 8, 0, 8, 0, 10, 0, 0, 11, 0, 10, 12, 0, 0};
     vector<int> APS = {12, 1, 4, 7, 11, 15, 18, 21, 23, 25, 26, 28, 31};
+    vector<vector<int>> mat_adj = {
+            {5, 3, 0, 0, 0, 0},
+            {0, 0, 1, 0, 0, 0},
+            {0, 0, 0, 1, 0, 0},
+            {0, 1, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0},
+            {0, 0, 0, 0, 0, 0}
+    };
     graphalgo::graph G{};
     graphalgo::graph G1{5};
+    graphalgo::graph GFSAPS{FS, APS};
+    graphalgo::graph GMAT{mat_adj, true};
     SUBCASE("Constructeur par défaut")
     {
         REQUIRE_EQ(G.n(), 0);
@@ -28,6 +39,29 @@ TEST_CASE("[graph]")
     {
         REQUIRE_EQ(G1.n(), 5);
         REQUIRE_EQ(G1.oriented(), true);
+    }
+
+    SUBCASE("Constructeur avec fs_aps") {
+        REQUIRE(GFSAPS.n() == 12);
+        REQUIRE(GFSAPS.oriented() == true);
+
+        vector<int> fs_res, aps_res;
+        GFSAPS.fs_aps(fs_res, aps_res);
+
+        compare(fs_res, FS);
+        compare(aps_res, APS);
+    }
+
+    SUBCASE("Constructeur avec mat_adj") {
+        REQUIRE(GMAT.n() == mat_adj[0][0]);
+        REQUIRE(GMAT.oriented() == true);
+
+        // Vérifier la matrice d'adjacence
+        vector<vector<int>> mat_res = GMAT.mat_adj();
+        REQUIRE_EQ(mat_res.size(), mat_adj.size());
+
+        for(int i = 0; i < mat_adj.size(); i++)
+            compare(mat_res[i], mat_adj[i]);
     }
 
     SUBCASE("Methodes")
@@ -276,6 +310,48 @@ TEST_CASE("[graph]")
                     compare(correction[i], matrice[i]);
                 }
             }
+        }
+
+        SUBCASE("graph::save(ost)")
+        {
+            graphalgo::graph g{12};
+
+            g.add_successor(1, 2);
+            g.add_successor(1, 3);
+            g.add_successor(2, 4);
+            g.add_successor(2, 9);
+            g.add_successor(3, 4);
+            g.add_successor(3, 6);
+            g.add_successor(3, 8);
+            g.add_successor(4, 8);
+            g.add_successor(4, 9);
+            g.add_successor(4, 11);
+            g.add_successor(5, 3);
+            g.add_successor(5, 6);
+            g.add_successor(6, 7);
+            g.add_successor(6, 8);
+            g.add_successor(7, 8);
+            g.add_successor(8, 10);
+            g.add_successor(10, 11);
+            g.add_successor(11, 10);
+            g.add_successor(11, 12);
+
+            std::ofstream ofs("graph.outg");
+            g.save(ofs);
+
+        }
+        SUBCASE("graph::load(ist)")
+        {
+            std::ifstream ifs("graph.outg");
+            vector<int> fs, aps;
+            graphalgo::graph g{};
+
+            g.load(ifs);
+            std::ofstream ofs("graph1.outg");
+            g.save(ofs);
+            g.fs_aps(fs, aps);
+            compare(FS, fs);
+            compare(APS, aps);
         }
     }
 
