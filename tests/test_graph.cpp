@@ -64,6 +64,16 @@ TEST_CASE("[graph]")
             compare(mat_res[i], mat_adj[i]);
     }
 
+    SUBCASE("Constructeur de copie") {
+        graphalgo::graph g{GFSAPS};
+
+        vector<int> fs_res, aps_res;
+        g.fs_aps(fs_res, aps_res);
+
+        compare(fs_res, FS);
+        compare(aps_res, APS);
+    }
+
     SUBCASE("Methodes")
     {
         SUBCASE("graph::find(s)")
@@ -352,6 +362,21 @@ TEST_CASE("[graph]")
             g.fs_aps(fs, aps);
             compare(FS, fs);
             compare(APS, aps);
+
+            std::remove("graph.outg");
+            std::remove("graph1.outg");
+        }
+
+        SUBCASE("graph::operator=(&g)")
+        {
+            graphalgo::graph g{};
+
+            g = GFSAPS;
+            vector<int> fs_res, aps_res;
+            g.fs_aps(fs_res, aps_res);
+
+            compare(fs_res, FS);
+            compare(aps_res, APS);
         }
     }
 
