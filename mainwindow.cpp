@@ -205,7 +205,9 @@ void MainWindow::onTelecharge()
     // On lit
     } else {
         std::ifstream ifs(fileName.toStdString());
-        d_graph.load(ifs);
+        graphalgo::graph g{};
+        g.load(ifs);
+        d_graph = g;
     }
     file.close();
 }
