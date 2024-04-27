@@ -128,11 +128,10 @@ vector<int> graphalgo::rang(const vector<int>& fs, const vector<int>& aps) {
     return rang;
 }
 
-vector<int> graphalgo::prufer(const vector<vector<int>>& a) {
+vector<int> graphalgo::prufer(vector<vector<int>> a) {
     int nbSommets = a[0][0];
     // Création du vecteur pour stocker le codage de Prufer
     vector<int> prf (nbSommets - 1);
-    vector<vector<int>> matriceAdj = a;
 
     prf[0] = nbSommets - 2;
     int k = 1;
@@ -140,26 +139,26 @@ vector<int> graphalgo::prufer(const vector<vector<int>>& a) {
     while(k <= nbSommets - 2) {
         // On cherche le premier sommet feuille
         int i = 1;
-        for(; matriceAdj[i][0] != 1; i++);
+        for(; a[i][0] != 1; i++);
 
         // On cherche le voisin du sommet feuille
         int j=1;
-        for(; matriceAdj[i][j] != 1; j++);
+        for(; a[i][j] != 1; j++);
 
         // On stocke du voisin dans le codage de Prufer
         prf[k++] = j;
 
         // On supprime le sommet feuille et ses arêtes
-        matriceAdj[i][j] = 0;
+        a[i][j] = 0;
         // On supprime  l'arête entre le sommet feuille et son voisin
-        matriceAdj[j][i] = 0;
-        matriceAdj[i][0] = 0; // On marque le sommet feuille comme supprimé
-        matriceAdj[j][0]--;
+        a[j][i] = 0;
+        a[i][0] = 0; // On marque le sommet feuille comme supprimé
+        a[j][0]--;
     }
     return prf;
 }
 
-pair<vector<int>, vector<int>> graphalgo::dijsktra(int s, const vector<int>& fs, const vector<int>& aps, const vector<vector<int>>& C) {
+/*pair<vector<int>, vector<int>> graphalgo::dijsktra(int s, const vector<int>& fs, const vector<int>& aps, const vector<vector<int>>& C) {
     int v, j, minDist;
     int nbSommet = aps[0];
     // Vecteurs pour stocker les distances minimales et les prédécesseurs
@@ -213,6 +212,76 @@ pair<vector<int>, vector<int>> graphalgo::dijsktra(int s, const vector<int>& fs,
 
     // On retourne les vecteurs de prédécesseurs et de distances minimales
     return make_pair(pred, d);
+}*/
+
+graphalgo::graph graphalgo::dijkstra(int s, graphalgo::graph &g) {
+    // Initialiser T avec le même nombre de noeuds et orientation que G
+    graphalgo::graph T = graphalgo::graph(g.n(), g.oriented());
+    // On récupère fs et aps
+    std::vector<int> fs, aps;
+    g.fs_aps(fs, aps);
+    // On récupère la matrice des coûts
+    std::vector<vector<int>> matCout = g.cost_matrice();
+
+    int v, j, minDist;
+    int nbSommet = aps[0];
+    // Vecteurs pour stocker les distances minimales et les prédécesseurs
+    vector<int> d(nbSommet + 1);
+    d[0] = nbSommet;
+    vector<int> pred(nbSommet + 1, 0);
+    // Vecteur pour marquer les sommets déjà traités
+    vector<bool> S(nbSommet + 1, true);
+
+    // Initialisation des distances
+    for(int i = 0; i < nbSommet; i++)
+        d[i+1] = matCout[s-1][i];
+
+    // Marquer le sommet source comme traité et sa distance à lui-même égale à 0
+    S[s] = false;
+    d[s] = 0;
+
+    // Boucle principale
+    for(int cpt = 0; cpt < nbSommet; cpt++) {
+        // Initialisation de la distance minimale à MAXPOIDS
+        minDist = graphalgo::MAXPOIDS;
+
+        // Recherche du sommet non traité avec la plus petite distance actuelle
+        for(int i = 1; i <= nbSommet; i++) {
+            if(S[i] && d[i] < minDist) {
+                minDist = d[i];
+                j = i;
+            }
+        }
+
+        // Si la distance minimale est toujours MAXPOIDS, on arrête le traitement
+        if(d[j] != graphalgo::MAXPOIDS) {
+            // Marquer le sommet sélectionné comme traité
+            S[j] = false;
+
+            // Mise à jour des distances des voisins du sommet sélectionné
+            for(int l = aps[j]; fs[l] != 0; l++) {
+                int k = fs[l];
+                if(S[k]) {
+                    v = d[j] + matCout[j-1][k-1]; // Calcul du nouveau poids potentiel
+                    if(v < d[k]) {
+                        d[k] = v; // Mise à jour de la distance minimale
+                        pred[k] = j; // Mise à jour du prédécesseur
+                    }
+                }
+            }
+        } else {
+            break; // Si la distance minimale est toujours infinie, on arrête le traitement
+        }
+    }
+
+    // Construire le graphe T à partir des prédécesseurs
+    for (int i = 1; i <= nbSommet; i++) {
+        if(pred[i] != 0) {
+            T.add_successor(pred[i], i, d[i]);
+        }
+    }
+
+    return T;
 }
 
 vector<vector<int>> graphalgo::dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout)
@@ -290,10 +359,10 @@ void graphalgo::fusion(int s, int t, vector<int>& prem, vector<int>& pilch, vect
     pilch[x] = prem[ct];
 }
 
-void graphalgo::kruskal(const graphalgo::graph& G, graphalgo::graph& T) {
+graphalgo::graph graphalgo::kruskal(const graphalgo::graph& G) {
     int nbSommets = G.n();
     // Initialiser T avec le même nombre de noeuds et orientation que G
-    T = graphalgo::graph(nbSommets, G.oriented());
+    graphalgo::graph T = graphalgo::graph(nbSommets, G.oriented());
 
     // On initialise les tableaux tampons
     vector<int> prem(nbSommets + 1);
@@ -325,4 +394,6 @@ void graphalgo::kruskal(const graphalgo::graph& G, graphalgo::graph& T) {
             if(k == nbSommets - 1) break;
         }
     }
+
+    return T;
 }

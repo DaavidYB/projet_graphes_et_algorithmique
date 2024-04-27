@@ -57,6 +57,11 @@ private slots:
     void onGrapheReceived(const graphalgo::graph& g);
 
     /**
+     * @brief Méthode privée réagissant au clic du bouton d_buttonLancerAlgo et permettant l'exécution de l'algorithme choisi
+     */
+    void onExecAlgo();
+
+    /**
      * @brief Méthode privée réagissant au clic du bouton buttonDessin et permetttant la saisie graphique d'un graph
      */
     void onDessine();
@@ -79,11 +84,11 @@ private slots:
     void onSaisieListeSommets();
 
     /**
-     * @brief Méthode privée permettant le téléchargement d'un graphe
+     * @brief Méthode privée réagissant au clic du bouton buttonFichier et permettant le téléchargement d'un graphe
      */
     void onTelecharge();
     /**
-     * @brief Méthode privée permettant la sauvegarde d'un graphe
+     * @brief Méthode privée réagissant au clic du bouton buttonSauvegarder et permettant la sauvegarde d'un graphe
      */
     void onSauvegarde();
 };

@@ -428,7 +428,7 @@ namespace graphalgo
 
     vector<vector<int>> graph::cost_matrice() const
     {
-        vector<vector<int>> ct_mat(d_n, vector<int>(d_n, -__INT_MAX__));
+        vector<vector<int>> ct_mat(d_n, vector<int>(d_n, __INT_MAX__));
 
         node *crt = d_tete;
         while(crt)

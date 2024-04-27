@@ -3,6 +3,7 @@
 #include "composents/vertexinput.h"
 #include "composents/matadjinput.h"
 #include "composents/graphview.h"
+#include "composents/outputalgo.h"
 #include <fstream>
 #include <QScreen>
 #include <QWidget>
@@ -69,6 +70,7 @@ void MainWindow::createInterface()
     d_listeAlgorithmes->addItem("Détermination des composantes fortement connexes selon Tarjan");
     d_listeAlgorithmes->addItem("Problème d'ordonnancement");
     d_listeAlgorithmes->addItem("Chemins les plus courts selon Dijkstra");
+    d_listeAlgorithmes->addItem("Chemins les plus courts selon Dantzig");
     d_listeAlgorithmes->addItem("Arbre recouvrant minimal d'un graphe non orienté selon Kruskal");
     d_listeAlgorithmes->addItem("Codage de Prüfer");
     d_buttonLancerAlgo = new QPushButton{"Lancer"};
@@ -110,7 +112,7 @@ void MainWindow::createInterface()
     connect(buttonFichier, &QPushButton::clicked, this, &MainWindow::onTelecharge);
     connect(buttonSauvegarder, &QPushButton::clicked, this, &MainWindow::onSauvegarde);
 
-    connect(buttonSauvegarder, &QPushButton::clicked, this, &MainWindow::onSauvegarde);
+    connect(d_buttonLancerAlgo, &QPushButton::clicked, this, &MainWindow::onExecAlgo);
 }
 
 // MÉTHODES ONCLIC
@@ -126,6 +128,12 @@ void MainWindow::onGrapheReceived(const graphalgo::graph& g)
         d_currentInputWindow->close();
         d_currentInputWindow = nullptr;
     }
+}
+
+void MainWindow::onExecAlgo() {
+    int i = d_listeAlgorithmes->currentIndex();
+    auto output {new outputAlgo{i, d_graph}};
+    output->show();
 }
 
 void MainWindow::onDessine()
@@ -208,6 +216,8 @@ void MainWindow::onTelecharge()
         graphalgo::graph g{};
         g.load(ifs);
         d_graph = g;
+        // On met à jour l'affichage
+        // d_graphview->graphChanged(d_graph);
     }
     file.close();
 }
