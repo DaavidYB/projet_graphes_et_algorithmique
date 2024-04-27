@@ -205,7 +205,7 @@ void outputAlgo::kruskal(graphalgo::graph& g) {
 
     // Création de la combobox pour choisir le sommet et du layout
     auto layoutSommet {new QHBoxLayout{}};
-    auto sommetLabel = new QLabel("Choisissez le sommet de référence :");
+    auto sommetLabel = new QLabel{"Choisissez le sommet de référence :"};
     d_comboBoxDijkstra = new QComboBox;
 
     // On remplit la combobox
@@ -245,13 +245,13 @@ void outputAlgo::dijkstra(graphalgo::graph &g) {
 
     // Création de la combobox pour choisir le sommet et du layout
     auto layoutSommet {new QHBoxLayout{}};
-    auto sommetLabel = new QLabel("Choisissez le sommet de référence :");
+    auto sommetLabel = new QLabel{"Choisissez le sommet de référence :"};
     d_comboBoxDijkstra = new QComboBox;
 
     graphalgo::graph p{6, true};
 
     // On remplit la combobox
-    d_comboBoxDistance = new QComboBox;
+    d_comboBoxDijkstra = new QComboBox;
     for(int i = 1; i <= p.n(); i++) {
         d_comboBoxDijkstra->addItem(QString::number(i));
     }
@@ -273,13 +273,22 @@ void outputAlgo::dijkstra(graphalgo::graph &g) {
     p.add_successor(6, 1, 2);
     p.add_successor(6, 2, 1);
 
+    /*p.add_successor(1, 3, 18);
+    p.add_successor(1, 5, 3);
+    p.add_successor(2, 1, 8);
+    p.add_successor(3, 2, 4);
+    p.add_successor(4, 2, 1);
+    p.add_successor(5, 2, 10);
+    p.add_successor(5, 4, 2);*/
+
+
     // Récupération du résultat du sommet 1 et création du graphView
     graphalgo::graph sommet1 = graphalgo::dijkstra(1, p);
     d_graphViewDijkstra = new graphView{sommet1};
     // Création du graphView pour afficher les résultats
     mainLayout->addWidget(d_graphViewDijkstra);
 
-    connect(d_comboBoxDistance, &QComboBox::currentIndexChanged, [this, &p] {
+    connect(d_comboBoxDijkstra, &QComboBox::currentIndexChanged, [this, &p] {
         calculerDijkstra(p);
     });
 }

@@ -221,20 +221,20 @@ graphalgo::graph graphalgo::dijkstra(int s, graphalgo::graph &g) {
     std::vector<int> fs, aps;
     g.fs_aps(fs, aps);
     // On récupère la matrice des coûts
-    std::vector<vector<int>> C = g.cost_matrice();
+    std::vector<vector<int>> matCout = g.cost_matrice();
 
     int v, j, minDist;
     int nbSommet = aps[0];
     // Vecteurs pour stocker les distances minimales et les prédécesseurs
     vector<int> d(nbSommet + 1);
+    d[0] = nbSommet;
     vector<int> pred(nbSommet + 1, 0);
     // Vecteur pour marquer les sommets déjà traités
     vector<bool> S(nbSommet + 1, true);
-    d[0] = nbSommet;
 
     // Initialisation des distances
     for(int i = 0; i < nbSommet; i++)
-        d[i+1] = C[s][i];
+        d[i+1] = matCout[s-1][i];
 
     // Marquer le sommet source comme traité et sa distance à lui-même égale à 0
     S[s] = false;
@@ -262,7 +262,7 @@ graphalgo::graph graphalgo::dijkstra(int s, graphalgo::graph &g) {
             for(int l = aps[j]; fs[l] != 0; l++) {
                 int k = fs[l];
                 if(S[k]) {
-                    v = d[j] + C[j][k]; // Calcul du nouveau poids potentiel
+                    v = d[j] + matCout[j-1][k-1]; // Calcul du nouveau poids potentiel
                     if(v < d[k]) {
                         d[k] = v; // Mise à jour de la distance minimale
                         pred[k] = j; // Mise à jour du prédécesseur

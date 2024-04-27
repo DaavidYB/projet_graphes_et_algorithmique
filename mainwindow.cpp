@@ -213,9 +213,11 @@ void MainWindow::onTelecharge()
     // On lit
     } else {
         std::ifstream ifs(fileName.toStdString());
-        d_graph.load(ifs);
+        graphalgo::graph g{};
+        g.load(ifs);
+        d_graph = g;
         // On met à jour l'affichage
-        d_graphview->graphChanged(d_graph);
+        // d_graphview->graphChanged(d_graph);
     }
     file.close();
 }

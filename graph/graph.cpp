@@ -1,5 +1,7 @@
 #include "graph.h"
 #include <algorithm>
+#include <string>
+#include <sstream>
 
 namespace graphalgo
 {
@@ -25,12 +27,15 @@ namespace graphalgo
 
     graph::graph(unsigned int n, bool oriented): d_n{static_cast<int>(n)}, d_oriented{oriented}
     {
-        d_tete = new node(1);
-        node *crt = d_tete;
-        for(int i = 2; i <= d_n; ++i)
+        if(d_n > 0)
         {
-            crt->d_next_m = new node(i);
-            crt = crt->d_next_m;
+            d_tete = new node(1);
+            node *crt = d_tete;
+            for(int i = 2; i <= d_n; ++i)
+            {
+                crt->d_next_m = new node(i);
+                crt = crt->d_next_m;
+            }
         }
     }
 
@@ -72,6 +77,33 @@ namespace graphalgo
                 node* ct;
                 if(mat_adj[i][j] == 1 && (!vertex(i, j, ct) || d_oriented))
                     add_successor(i, j);
+            }
+        }
+    }
+
+    graph::graph(const graph& g): d_n{g.d_n}, d_oriented{g.d_oriented}
+    {
+        if(d_n > 0)
+        {
+            d_tete = new node(1);
+            node *crt = d_tete;
+            for(int i = 2; i <= d_n; ++i)
+            {
+                crt->d_next_m = new node(i);
+                crt = crt->d_next_m;
+            }
+
+            crt = g.d_tete;
+            while(crt)
+            {
+
+                node* crt_ct = crt->d_next_s;
+                while(crt_ct)
+                {
+                    add_successor(crt->d_n, crt_ct->d_next_m->d_n, crt_ct->d_n);
+                    crt_ct = crt_ct->d_next_s;
+                }
+                crt = crt->d_next_m;
             }
         }
     }
@@ -264,7 +296,7 @@ namespace graphalgo
             crt_ct->d_n = cost;
     }
 
-    void graph::fs_aps(vector<int>& fs, vector<int>& aps)
+    void graph::fs_aps(vector<int> &fs, vector<int> &aps)
     {
         if(!d_tete)
             return;
@@ -396,7 +428,7 @@ namespace graphalgo
 
     vector<vector<int>> graph::cost_matrice() const
     {
-        vector<vector<int>> ct_mat(d_n, vector<int>(d_n, -__INT_MAX__));
+        vector<vector<int>> ct_mat(d_n, vector<int>(d_n, __INT_MAX__));
 
         node *crt = d_tete;
         while(crt)
@@ -416,5 +448,66 @@ namespace graphalgo
         }
 
         return ct_mat;
+    }
+
+    void graph::save(std::ostream& ost) const
+    {
+        ost << d_n << " " << d_oriented << std::endl;
+        
+        node* crt = d_tete;
+
+        while(crt)
+        {
+
+            node* crt_ct = crt->d_next_s;
+            while(crt_ct)
+            {
+                ost << crt->d_n << " " << crt_ct->d_next_m->d_n << "-" << crt_ct->d_n;
+                crt_ct = crt_ct->d_next_s;
+                ost << std::endl;
+            }
+            crt = crt->d_next_m;
+        }
+    }
+
+    void graph::load(std::istream& ist)
+    {
+        ist >> d_n >> d_oriented;
+        if(d_n > 0)
+        {
+            d_tete = new node(1);
+            node *crt = d_tete;
+            for(int i = 2; i <= d_n; ++i)
+            {
+                crt->d_next_m = new node(i);
+                crt = crt->d_next_m;
+            }
+
+            std::string line;
+            while ( std::getline(ist, line ) ) {
+                std::istringstream li( line);
+                int s, ss, cost;
+                char c;
+                
+                li >> s >> ss >> c >> cost;
+                add_successor(s, ss, cost);
+            }
+        }
+    }
+
+    graph& graph::operator=(const graph &g)
+    {
+        if (this != &g) { // Check for self-assignment
+            // Create a copy of the graph 'g'
+            graph new_graph{g};
+            d_n = g.d_n;
+            d_oriented = g.d_oriented;
+
+            // Swap the contents of 'this' and 'new_graph'
+            std::swap(d_tete, new_graph.d_tete);
+
+            // No need to delete 'tmp' as it's just a pointer swap
+        }
+        return *this;
     }
 }
