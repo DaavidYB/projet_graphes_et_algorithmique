@@ -1,6 +1,7 @@
 #include "graphview.h"
 #include <random>
 #include <QLineF>
+#include <QMessageBox>
 
 // CONSTRUCTEURS
 
@@ -43,9 +44,8 @@ QSize graphView::sizeHint() const
 void graphView::paintEvent(QPaintEvent *)
 {
     QPainter painter{this};
-    // painter.setRenderHint(QPainter::Antialiasing);
-    // painter.fillRect(0, 0, width(), height(), Qt::white);
-    dessineGraph(painter);
+    if(d_graph.n() > 0)
+        dessineGraph(painter);
 }
 
 // MÉTHODE BACK-END
@@ -171,16 +171,15 @@ std::vector<graphNode> graphView::calculePositions(std::vector<graphalgo::vtx> v
 
 void graphView::dessineGraph(QPainter &painter)
 {
+     std::vector<graphalgo::vtx> vtxs = d_graph.vertexes();
     // Récupérer les positions des nœuds
-    // d_listeNoeuds = calculePositions();
-    d_listeNoeuds = calculePositions(d_graph.vertexes());
+    d_listeNoeuds = calculePositions(vtxs);
 
     // On dessine les nœuds
     for(const auto item : d_listeNoeuds)
         dessineNoeud(painter, item);
 
     // On récupère les liaisons
-    std::vector<graphalgo::vtx> vtxs = d_graph.vertexes();
     for (const auto& v : vtxs) {
         int s = v.s - 1;
         int t = v.t - 1;
