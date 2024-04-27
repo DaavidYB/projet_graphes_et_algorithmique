@@ -10,6 +10,12 @@ void graphalgo::empiler(int x, vector<int>& pilch) {
     pilch[0] = x;
 }
 
+int graphalgo::depiler(vector<int>& pilch) {
+    int x = pilch[0];
+    pilch[0] = pilch[x];
+    return x;
+}
+
 vector<int> graphalgo::distance(int sommet, const vector<int>& fs, const vector<int>& aps){
     // On déclare une variable contenant le nombre de sommets du graph
     int nbSommets = aps[0];
@@ -283,6 +289,71 @@ graphalgo::graph graphalgo::dijkstra(int s, graphalgo::graph &g) {
 
     return T;
 }
+
+/*graphalgo::graph dijkstra(int s, graphalgo::graph &g) {
+    int ind;
+    int i, j, k, v, m;
+    bool oriented = g.oriented();
+    std::vector<int> fs, aps;
+    g.fs_aps(fs, aps);
+    std::vector<std::vector<int>> p = g.cost_matrice();
+    int n = aps[0];
+    m = fs[0];
+
+    // Initialiser les tableaux et structures de données
+    std::vector<int> pr(n + 1, -1);
+    std::vector<int> d(n + 1, graphalgo::MAXPOIDS);
+    std::vector<int> inS(n + 1, 1); // 1 pour les sommets à traiter
+
+    for (i = 0;i < n; i++)
+        d[i+1] = p[s-1][i];
+
+    // Initialiser les tableaux de résultats
+    d[s] = 0;
+    pr[s] = 0;
+    inS[s] = 0; // Marquer le sommet 's' comme traité
+    ind = n - 1; // Nombre d'éléments restants à traiter
+
+    while (ind > 0) {
+        // Trouver le sommet non traité avec la plus petite distance
+        m = graphalgo::MAXPOIDS;
+        for (int i = 1; i <= n; i++) {
+            if (inS[i] == 1 && d[i] < m) {
+                m = d[i];
+                j = i;
+            }
+        }
+
+        // S'il n'y a plus de sommets à traiter, terminer
+        if (m == graphalgo::MAXPOIDS) break;
+
+        inS[j] = 0; // Marquer le sommet 'j' comme traité
+        ind--;
+
+        // Mettre à jour les distances et les prédécesseurs pour les successeurs de 'j'
+        k = aps[j];
+        while (fs[k] != 0) {
+            if (inS[fs[k]] == 1) {
+                v = d[j] + p[j-1][fs[k]-1];
+                if (v < d[fs[k]]) {
+                    d[fs[k]] = v;
+                    pr[fs[k]] = j;
+                }
+            }
+            k++;
+        }
+    }
+
+    // Construction du graphe résultant à partir des prédécesseurs
+    graphalgo::graph result(n, oriented);
+    for (int i = 1; i <= n; i++) {
+        if (pr[i] != -1) {
+            result.add_successor(pr[i], i, d[i]);
+        }
+    }
+
+    return result;
+}*/
 
 vector<vector<int>> graphalgo::dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout)
 {

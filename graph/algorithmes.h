@@ -19,6 +19,12 @@ namespace graphalgo{
      * @param pilch - La pile chainée
      */
     void empiler (int x, vector<int>& pilch);
+    /**
+     * @brief Fonction permettant de dépiler un sommet dans une pile chainée
+     * @param pilch - La pile chainée
+     * @return La valeur dépilée
+     */
+    int depiler(vector<int>& pilch);
     void fusion(int s, int t, vector<int>& prem, vector<int>& pilch, vector<int>& cfc);
 
     /**
