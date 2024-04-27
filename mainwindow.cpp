@@ -15,6 +15,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include <string>
+
 // CONSTRUCTEURS
 
 MainWindow::MainWindow(QWidget *parent)
@@ -199,25 +201,31 @@ void MainWindow::onTelecharge()
         return; // L'utilisateur a annulé la sauvegarde
     }
 
-    // On vérifie que l'utilisateur a choisi un fichier compatible
-    if(!fileName.endsWith({".graph"})) {
-        QMessageBox::critical(this, "Erreur de compatibilité", "Le fichier sélectionné doit être un .graph");
-        return;
-    }
-
     // On ouvre le fichier en écriture
     QFile file(fileName);
-    if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::critical(this, "Erreur d'écriture", "Impossible d'ouvrir le fichier en écriture.");
+    if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+        QMessageBox::critical(this, "Erreur de lecture", "Impossible d'ouvrir le fichier en lecture.");
 
-    // On lit
     } else {
-        std::ifstream ifs(fileName.toStdString());
-        graphalgo::graph g{};
-        g.load(ifs);
-        d_graph = g;
-        // On met à jour l'affichage
-        // d_graphview->graphChanged(d_graph);
+        QTextStream in(&file);
+        QString fileContent = in.readAll();
+        file.close();
+
+        if (fileContent.isEmpty()) {
+            QMessageBox::critical(this, "Erreur de lecture", "Le fichier sélectionné est vide.");
+
+        } else {
+            std::ifstream ifs {fileName.toStdString()};
+            if(ifs.good()){
+                graphalgo::graph g{};
+                g.load(ifs);
+                d_graph = g;
+                // On met à jour l'affichage
+                d_graphview->graphChanged(g);
+            } else {
+                QMessageBox::critical(this, "Erreur d'importation", "Impossible de lire le fichier.");
+            }
+        }
     }
     file.close();
 }

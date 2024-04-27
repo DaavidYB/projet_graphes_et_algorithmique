@@ -55,6 +55,7 @@ private slots:
      * @param g - le graphe reçu
      */
     void onGrapheReceived(const graphalgo::graph& g);
+
     /**
      * @brief Méthode privée réagissant au clic du bouton d_buttonLancerAlgo et permettant l'exécution de l'algorithme choisi
      */

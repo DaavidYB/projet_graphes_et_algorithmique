@@ -4,6 +4,7 @@
 #include <vector>
 #include <utility>
 using std::vector;
+#include <iostream>
 
 namespace graphalgo
 {
@@ -72,6 +73,10 @@ namespace graphalgo
              * @param mat_adj: the adjacency matrix
              */
             graph(const vector<vector<int>>& mat_adj, bool oriented = true);
+            /**
+             * @brief graph copie constructor
+             */
+            graph(const graph& g);
             /**
              * @brief destructor;
              */
@@ -158,6 +163,9 @@ namespace graphalgo
             vector<vtx> vertexes() const;
 
             vector<vector<int>> cost_matrice() const;
+            void save(std::ostream& ost) const;
+            void load(std::istream& ist);
+            graph& operator=(const graph &g);
 
         private:
             // nb of node
