@@ -8,6 +8,10 @@
 
 class QComboBox;
 class QPushButton;
+
+/**
+ * @brief Fenêtre principale de l'application
+ */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -22,10 +26,10 @@ private:
      * @brief Le graph courant qui s'affiche
      */
     // graphalgo::graph d_graph;
-    // !! TEMPORAIRE !! //
-    vector<int> FS = {31, 2, 3, 0, 4, 9, 0, 4, 6, 8, 0, 8, 9, 11, 0, 3, 6, 0, 7, 8, 0, 8, 0, 10, 0, 0, 11, 0, 10, 12, 0, 0};
-    vector<int> APS = {12, 1, 4, 7, 11, 15, 18, 21, 23, 25, 26, 28, 31};
-    graphalgo::graph d_graph{FS, APS};
+    graphalgo::graph d_graph{
+        {31, 2, 3, 0, 4, 9, 0, 4, 6, 8, 0, 8, 9, 11, 0, 3, 6, 0, 7, 8, 0, 8, 0, 10, 0, 0, 11, 0, 10, 12, 0, 0},
+        {12, 1, 4, 7, 11, 15, 18, 21, 23, 25, 26, 28, 31}
+    };
 
     /**
      * @brief La liste des algorithmes
@@ -48,6 +52,11 @@ private:
      * @brief QWidget affichant la représentation graphique de d_graph
      */
     graphView *d_graphview;
+
+    /**
+     * @brief Méthode privée chargeant le graph par défaut
+     */
+    void loadGraph();
 
 private slots:
     /**

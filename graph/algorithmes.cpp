@@ -158,130 +158,88 @@ vector<int> graphalgo::prufer(vector<vector<int>> a) {
     return prf;
 }
 
-/*pair<vector<int>, vector<int>> graphalgo::dijsktra(int s, const vector<int>& fs, const vector<int>& aps, const vector<vector<int>>& C) {
-    int v, j, minDist;
-    int nbSommet = aps[0];
-    // Vecteurs pour stocker les distances minimales et les prédécesseurs
-    vector<int> d(nbSommet + 1);
-    vector<int> pred(nbSommet + 1, 0);
-    // Vecteur pour marquer les sommets déjà traités
-    vector<bool> S(nbSommet + 1, true);
-    d[0] = nbSommet;
-
-    // Initialisation des distances
-    for(int i = 1; i <= nbSommet; i++)
-        d[i] = C[s][i];
-
-    // Marquer le sommet source comme traité et sa distance à lui-même égale à 0
-    S[s] = false;
-    d[s] = 0;
-
-    // Boucle principale
-    for(int cpt = 0; cpt < nbSommet; cpt++) {
-        // Initialisation de la distance minimale à MAXPOIDS
-        minDist = graphalgo::MAXPOIDS;
-
-        // Recherche du sommet non traité avec la plus petite distance actuelle
-        for(int i = 1; i <= nbSommet; i++) {
-            if(S[i] && d[i] < minDist) {
-                minDist = d[i];
-                j = i;
-            }
-        }
-
-        // Si la distance minimale est toujours MAXPOIDS, on arrête le traitement
-        if(d[j] != graphalgo::MAXPOIDS) {
-            // Marquer le sommet sélectionné comme traité
-            S[j] = false;
-
-            // Mise à jour des distances des voisins du sommet sélectionné
-            for(int l = aps[j]; fs[l] != 0; l++) {
-                int k = fs[l];
-                if(S[k]) {
-                    v = d[j] + C[j][k]; // Calcul du nouveau poids potentiel
-                    if(v < d[k]) {
-                        d[k] = v; // Mise à jour de la distance minimale
-                        pred[k] = j; // Mise à jour du prédécesseur
-                    }
-                }
-            }
-        } else {
-            break; // Si la distance minimale est toujours infinie, on arrête le traitement
-        }
+inline vector<int> retireIndex(const std::vector<int> &tab, int index)
+{
+    index++;
+    vector<int> res;
+    for(unsigned i = 0; i < tab.size(); i++){
+        if(tab[i] != index)
+            res.push_back(tab[i]);
     }
+    return res;
+}
 
-    // On retourne les vecteurs de prédécesseurs et de distances minimales
-    return make_pair(pred, d);
-}*/
+graphalgo::graph graphalgo::dijkstra(int s_depart, graphalgo::graph &g)
+{
+    const int nb_sommets = g.n();
 
-graphalgo::graph graphalgo::dijkstra(int s, graphalgo::graph &g) {
-    // Initialiser T avec le même nombre de noeuds et orientation que G
-    graphalgo::graph T = graphalgo::graph(g.n(), g.oriented());
-    // On récupère fs et aps
+    // On récupère fs-aps et la matrice des coûts
     std::vector<int> fs, aps;
     g.fs_aps(fs, aps);
-    // On récupère la matrice des coûts
     std::vector<vector<int>> matCout = g.cost_matrice();
 
-    int v, j, minDist;
-    int nbSommet = aps[0];
-    // Vecteurs pour stocker les distances minimales et les prédécesseurs
-    vector<int> d(nbSommet + 1);
-    d[0] = nbSommet;
-    vector<int> pred(nbSommet + 1, 0);
-    // Vecteur pour marquer les sommets déjà traités
-    vector<bool> S(nbSommet + 1, true);
+    // On déclare et initialise les variables tampons
+    vector<int> d(nb_sommets, graphalgo::MAXPOIDS), pred(nb_sommets, -1);
+    d[s_depart - 1] = 0;
+    pred[s_depart - 1] = 0;
 
-    // Initialisation des distances
-    for(int i = 0; i < nbSommet; i++)
-        d[i+1] = matCout[s-1][i];
+    // On déclare un tableau indiquant les sommets non-parcourus
+    vector<int> sommets_non_traites(nb_sommets);
+    for(int i = 0; i < nb_sommets; i++)
+        sommets_non_traites[i] = i + 1;
 
-    // Marquer le sommet source comme traité et sa distance à lui-même égale à 0
-    S[s] = false;
-    d[s] = 0;
 
-    // Boucle principale
-    for(int cpt = 0; cpt < nbSommet; cpt++) {
-        // Initialisation de la distance minimale à MAXPOIDS
-        minDist = graphalgo::MAXPOIDS;
+    // On traite le sommet dont la distance est la plus petite
+    for(int i = 0; i < nb_sommets; i++){
+        // On déclare des variables tampons pour chercher le sommet de travail (plus courte distance)
+        int s_courant = graphalgo::MAXPOIDS, distSommet = graphalgo::MAXPOIDS;
+        bool inacessible = true;
 
-        // Recherche du sommet non traité avec la plus petite distance actuelle
-        for(int i = 1; i <= nbSommet; i++) {
-            if(S[i] && d[i] < minDist) {
-                minDist = d[i];
-                j = i;
+        // On cherche le sommet de travail
+        for(unsigned j = 0; j < sommets_non_traites.size(); j++){
+            int s = sommets_non_traites[j] - 1;
+            if(d[s] < distSommet){
+                s_courant = s;
+                distSommet = d[s];
+                // Il reste au moins un sommet accessible
+                inacessible = false;
             }
         }
 
-        // Si la distance minimale est toujours MAXPOIDS, on arrête le traitement
-        if(d[j] != graphalgo::MAXPOIDS) {
-            // Marquer le sommet sélectionné comme traité
-            S[j] = false;
+        // Je vérifie que les sommets restant sont accessibles
+        if(!inacessible){
+            // On traite les successeurs du sommet de travail
+            int indice = aps[s_courant + 1];
+            while(fs[indice] != 0){
+                // On récupère les sonnées
+                int sommet_successeur = fs[indice] - 1;
+                int c_sommet = d[s_courant];
+                int c_chemin = matCout[s_courant][sommet_successeur];
 
-            // Mise à jour des distances des voisins du sommet sélectionné
-            for(int l = aps[j]; fs[l] != 0; l++) {
-                int k = fs[l];
-                if(S[k]) {
-                    v = d[j] + matCout[j-1][k-1]; // Calcul du nouveau poids potentiel
-                    if(v < d[k]) {
-                        d[k] = v; // Mise à jour de la distance minimale
-                        pred[k] = j; // Mise à jour du prédécesseur
-                    }
+                // On test si le nouveau chemin est plus court
+                if(c_sommet + c_chemin < d[sommet_successeur]){
+                    // On implémente
+                    d[sommet_successeur] = c_sommet + c_chemin;
+                    pred[sommet_successeur] = s_courant + 1;
                 }
+                indice++;
             }
-        } else {
-            break; // Si la distance minimale est toujours infinie, on arrête le traitement
         }
+
+        // sommets_non_traites.erase(sommets_non_traites.begin() + s_courant);
+        sommets_non_traites = retireIndex(sommets_non_traites, s_courant);
     }
 
-    // Construire le graphe T à partir des prédécesseurs
-    for (int i = 1; i <= nbSommet; i++) {
-        if(pred[i] != 0) {
-            T.add_successor(pred[i], i, d[i]);
-        }
-    }
 
-    return T;
+    // On déclare le graph réduit
+    graphalgo::graph newG = graphalgo::graph(nb_sommets, g.oriented());
+    // On remplit newG
+    for(int i = 0; static_cast<unsigned>(i) < pred.size(); i++){
+        if(pred[i] != i + 1)
+            newG.add_successor(pred[i], i + 1, d[i]);
+    }
+    // On retourne le graph réduit
+    return newG;
 }
 
 vector<vector<int>> graphalgo::dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout)

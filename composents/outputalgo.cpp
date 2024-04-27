@@ -3,6 +3,8 @@
 #include "graphview.h"
 #include <QPushButton>
 
+#include <fstream>
+
 outputAlgo::outputAlgo(int indiceOutput, graphalgo::graph &g, QWidget *parent)
     : QWidget(parent)
 {
@@ -190,46 +192,6 @@ void outputAlgo::kruskal(graphalgo::graph& g) {
     mainLayout->addWidget(graphview);
 }
 
-/*void outputAlgo::dijkstra(graphalgo::graph &g) {
-    // Création du layout
-    auto mainLayout {new QVBoxLayout{this}};
-
-    // Titre de la fenêtre
-    auto title = new QLabel("Affichage des chemins les plus courts selon Dijkstra");
-    mainLayout->addWidget(title);
-
-    // Ajout d'une ligne de séparation
-    auto separationLine = new QFrame;
-    separationLine->setFrameStyle(QFrame::HLine | QFrame::Sunken);
-    mainLayout->addWidget(separationLine);
-
-    // Création de la combobox pour choisir le sommet et du layout
-    auto layoutSommet {new QHBoxLayout{}};
-    auto sommetLabel = new QLabel{"Choisissez le sommet de référence :"};
-    d_comboBoxDijkstra = new QComboBox;
-
-    // On remplit la combobox
-    d_comboBoxDistance = new QComboBox;
-    for(int i = 1; i <= g.n(); i++) {
-        d_comboBoxDijkstra->addItem(QString::number(i));
-    }
-    // On fait les ajouts aux différents layouts
-    layoutSommet->addWidget(sommetLabel);
-    layoutSommet->addWidget(d_comboBoxDijkstra);
-    mainLayout->addLayout(layoutSommet);
-
-    // Récupération du résultat du sommet 1 et création du graphView
-    graphalgo::graph sommet1 = graphalgo::dijkstra(1, g);
-    d_graphViewDijkstra = new graphView{sommet1};
-    // Création du graphView pour afficher les résultats
-    mainLayout->addWidget(d_graphViewDijkstra);
-
-    connect(d_comboBoxDistance, &QComboBox::currentIndexChanged, [this, &g] {
-        calculerDijkstra(g);
-    });
-}*/
-
-// TESTS
 void outputAlgo::dijkstra(graphalgo::graph &g) {
     // Création du layout
     auto mainLayout {new QVBoxLayout{this}};
@@ -262,9 +224,7 @@ void outputAlgo::dijkstra(graphalgo::graph &g) {
 
     p.add_successor(1, 2, 10);
     p.add_successor(1, 3, 3);
-    p.add_successor(1, 5, 6);
     p.add_successor(2, 1, 0);
-    p.add_successor(3, 2, 4);
     p.add_successor(3, 5, 2);
     p.add_successor(4, 3, 1);
     p.add_successor(4, 5, 3);
@@ -273,14 +233,28 @@ void outputAlgo::dijkstra(graphalgo::graph &g) {
     p.add_successor(6, 1, 2);
     p.add_successor(6, 2, 1);
 
-    /*p.add_successor(1, 3, 18);
-    p.add_successor(1, 5, 3);
-    p.add_successor(2, 1, 8);
-    p.add_successor(3, 2, 4);
-    p.add_successor(4, 2, 1);
-    p.add_successor(5, 2, 10);
-    p.add_successor(5, 4, 2);*/
+    // p.add_successor(1, 2, 10);
+    // p.add_successor(1, 3, 3);
+    // p.add_successor(1, 5, 6);
+    // p.add_successor(2, 1, 0);
+    // p.add_successor(3, 2, 4);
+    // p.add_successor(3, 5, 2);
+    // p.add_successor(4, 3, 1);
+    // p.add_successor(4, 5, 3);
+    // p.add_successor(5, 2, 0);
+    // p.add_successor(5, 6, 1);
+    // p.add_successor(6, 1, 2);
+    // p.add_successor(6, 2, 1);
 
+    // p.add_successor(1, 2, 0);
+    // p.add_successor(1, 5, 1);
+    // p.add_successor(2, 1, 0);
+    // p.add_successor(2, 3, 1);
+    // p.add_successor(3, 5, 0);
+    // p.add_successor(4, 3, 3);
+    // p.add_successor(4, 5, 0);
+    // p.add_successor(4, 1, 1);
+    // p.add_successor(5, 2, 2);
 
     // Récupération du résultat du sommet 1 et création du graphView
     graphalgo::graph sommet1 = graphalgo::dijkstra(1, p);

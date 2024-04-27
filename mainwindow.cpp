@@ -15,13 +15,12 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
-#include <string>
-
 // CONSTRUCTEURS
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    // loadGraph();
     createInterface();
 }
 
@@ -117,6 +116,22 @@ void MainWindow::createInterface()
     connect(d_buttonLancerAlgo, &QPushButton::clicked, this, &MainWindow::onExecAlgo);
 }
 
+void MainWindow::loadGraph()
+{
+    // On initialise le flux de lecture
+    std::string source{"assets/graph_courant.graph"};
+    std::ifstream import_graph_courant {source};
+
+    // On test la lecture
+    if(import_graph_courant.good()){
+        // On importe le graph courant
+        graphalgo::graph g{};
+        g.load(import_graph_courant);
+        d_graph = g;
+
+    // Sinon
+    } else QMessageBox::critical(this, "Erreur de lecture", "Le fichier graph_courant.graph est introuvable");
+}
 // MÉTHODES ONCLIC
 
 void MainWindow::onGrapheReceived(const graphalgo::graph& g)

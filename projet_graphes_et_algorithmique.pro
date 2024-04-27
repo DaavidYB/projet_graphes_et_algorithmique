@@ -33,3 +33,9 @@ HEADERS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+resources.files = \
+    ./assets/graph_courant.graph
+resources.prefix = /
+
+RESOURCES = resources
