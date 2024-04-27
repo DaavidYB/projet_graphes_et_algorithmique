@@ -214,6 +214,8 @@ void MainWindow::onTelecharge()
     } else {
         std::ifstream ifs(fileName.toStdString());
         d_graph.load(ifs);
+        // On met à jour l'affichage
+        d_graphview->graphChanged(d_graph);
     }
     file.close();
 }

@@ -6,6 +6,7 @@
 #include <QBoxLayout>
 #include <QComboBox>
 #include <QLabel>
+#include "composents/graphview.h"
 #include "graph/graph.h"
 
 class outputAlgo :  public QWidget
@@ -16,17 +17,20 @@ public:
     ~outputAlgo();
 private slots:
     void calculerDistances(graphalgo::graph &g);
+    void calculerDijkstra(graphalgo::graph& g);
 private:
-    // QVBoxLayout* d_layoutDistance;
     QComboBox* d_comboBoxDistance;
     QLabel* d_resultatsDistance;
 
+    QComboBox* d_comboBoxDijkstra;
+    graphView* d_graphViewDijkstra;
+
     void distance(graphalgo::graph &g);
     void rang(graphalgo::graph &g);
-    void dijkstra();
+    void dijkstra(graphalgo::graph &g);
     void dantzig();
-    void kruskal();
-    void prufer();
+    void kruskal(graphalgo::graph &g);
+    void prufer(graphalgo::graph& g);
 };
 
 #endif // OUTPUTALGO_H

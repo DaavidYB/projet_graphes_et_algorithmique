@@ -5,12 +5,13 @@
 #ifndef PROJETGRAPHE_ALGORITHMES_H
 #define PROJETGRAPHE_ALGORITHMES_H
 
+#include "graph.h"
 #include <vector>
 
 using std::vector, std::pair;
 
 namespace graphalgo{
-    const int MAXPOIDS = 100;
+    const int MAXPOIDS = __INT_MAX__;
 
     /**
      * @brief Fonction permettant d'empiler un sommet dans une pile chainée
@@ -45,15 +46,21 @@ namespace graphalgo{
      * @param C La matrice des poids des arêtes.
      * @return Une paire de vecteurs contenant les prédécesseurs et les distances minimales de chaque sommet par rapport au sommet source.
      */
-    pair<vector<int>, vector<int>> dijsktra(int s, const vector<int>& fs, const vector<int>& aps, const vector<vector<int>>& C);
-    void dantzig();
-    void kruskal();
+    // pair<vector<int>, vector<int>> dijsktra(int s, const vector<int>& fs, const vector<int>& aps, const vector<vector<int>>& C);
+    graphalgo::graph dijkstra(int s, graphalgo::graph &g);
+    /**
+     * @brief Fonction appliquant l'algorithme de dantzig.
+     * @param matriceAdj La matrice d'adjacence
+     * @param matriceCout La matrice des coûts associée
+     */
+    vector<vector<int>> dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout);
+    graphalgo::graph kruskal(const graphalgo::graph& G);
     /**
      * @brief Fonction retournant le codage de Prufer d'un arbre donné par sa matrice d'adjacence.
      * @param a La matrice d'adjacence représentant l'arbre.
      * @return Le codage de Prufer de l'arbre.
      */
-    vector<int> prufer(const vector<vector<int>>& a);
+    vector<int> prufer(vector<vector<int>> a);
     // décodage prufer à faire ? vector<vector<int>> decodagePrufer(const vector<int>& prufer)
 }
 
