@@ -171,9 +171,12 @@ std::vector<graphNode> graphView::calculePositions(std::vector<graphalgo::vtx> v
 
 void graphView::dessineGraph(QPainter &painter)
 {
-     std::vector<graphalgo::vtx> vtxs = d_graph.vertexes();
-    // Récupérer les positions des nœuds
-    d_listeNoeuds = calculePositions(vtxs);
+    std::vector<graphalgo::vtx> vtxs = d_graph.vertexes();
+
+    if(d_listeNoeuds.size() == 0){
+        // Récupérer les positions des nœuds
+        d_listeNoeuds = calculePositions(vtxs);
+    }
 
     // On dessine les nœuds
     for(const auto item : d_listeNoeuds)

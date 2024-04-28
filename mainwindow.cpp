@@ -121,7 +121,7 @@ void MainWindow::createInterface()
 void MainWindow::loadGraph()
 {
     // On initialise le flux de lecture
-    std::string source{":assets/graph_courant.graph"};
+    std::string source{"./assets/graph_courant.graph"};
     std::ifstream import_graph_courant {source};
 
     // On test la lecture
