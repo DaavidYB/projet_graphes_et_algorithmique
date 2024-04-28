@@ -15,6 +15,8 @@
 #include <QFileDialog>
 #include <QMessageBox>
 
+#include <string>
+
 // CONSTRUCTEURS
 
 MainWindow::MainWindow(QWidget *parent)
