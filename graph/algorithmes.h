@@ -67,7 +67,6 @@ namespace graphalgo{
      * @return Le codage de Prufer de l'arbre.
      */
     vector<int> prufer(vector<vector<int>> a);
-    // décodage prufer à faire ? vector<vector<int>> decodagePrufer(const vector<int>& prufer)
 
 
     void traversee(int s, int &k, int &p, const std::vector<int> &fs, const std::vector<int> &aps, std::vector<int>& prem, std::vector<int>& pilch, std::vector<int>& cfc, std::vector<int>& pred, std::vector<int>& tarj, std::vector<bool>& entarj, std::vector<int>& num, std::vector<int>& ro);

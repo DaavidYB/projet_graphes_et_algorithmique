@@ -2,8 +2,15 @@
 #define FSAPSINPUT_H
 
 #include <QWidget>
-#include <QLineEdit>
+
 #include "graph/graph.h"
+
+class QCheckBox;
+class QLineEdit;
+class QLabel;
+class coutInput;
+class QPushButton;
+class QBoxLayout;
 
 class fsapsInput : public QWidget
 {
@@ -20,11 +27,46 @@ public:
      */
     ~fsapsInput();
 
+private:
+    QBoxLayout *d_mainLayout;
+    /**
+     * @brief Attributs privés stockant les label du QWidget
+     */
+    QLabel *d_labelFS, *d_labelAPS, *d_labelCout;
+    /**
+     * @brief Attributs privés contenant les champs de saisie des tableaux FS et APS
+     */
+    QLineEdit *d_inputFS, *d_inputAPS;
+    /**
+     * @brief Attribut privé contenant le bouton clickable indiquant si le grave psosède des coûts
+     */
+    QCheckBox *d_checkCouts;
+    QPushButton *d_validateButton;
+    /**
+     * @brief Attribut privé contenant le coutInput
+     */
+    coutInput *d_coutinput;
+
+
+    /**
+     * @brief Méthode privée pour créer l'interface graphique
+     */
+    void createInterface();
+    /**
+     * @brief Méthode privée mettant à jour l'affichage pour permettre la saisie des coûts
+     */
+    void updateInterface(const std::vector<int> &fs, const std::vector<int> &aps);
+
 private slots:
     /**
-     * @brief Slot appelé lorsque l'utilisateur clique sur le bouton "Valider"
+     * @brief Méthode privée appelé lorsque l'utilisateur clique sur le bouton "Valider"
      */
     void onValidate();
+    /**
+     * @brief Méthode privée réagissant au signal graphe d'un coutInput et renvoygant le graph généré à la MainWinodw
+     * @param g Le graph généré
+     */
+    void onGraphReceived(graphalgo::graph &g);
 
 signals:
     /**
@@ -32,16 +74,6 @@ signals:
      * @param g Le graphe construit
      */
     void graphe(const graphalgo::graph& g);
-
-private:
-    /**
-     * @brief Pointeurs vers les champs de saisie des tableaux FS et APS
-     */
-    QLineEdit *d_inputFS, *d_inputAPS;
-    /**
-     * @brief Méthode privée pour créer l'interface graphique
-     */
-    void createInterface();
 };
 
 /**
