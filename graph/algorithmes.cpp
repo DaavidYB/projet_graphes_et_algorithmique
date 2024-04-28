@@ -10,6 +10,12 @@ void graphalgo::empiler(int x, vector<int>& pilch) {
     pilch[0] = x;
 }
 
+int graphalgo::depiler(vector<int>& pilch) {
+    int x = pilch[0];
+    pilch[0] = pilch[x];
+    return x;
+}
+
 vector<int> graphalgo::distance(int sommet, const vector<int>& fs, const vector<int>& aps){
     // On déclare une variable contenant le nombre de sommets du graph
     int nbSommets = aps[0];
@@ -128,11 +134,10 @@ vector<int> graphalgo::rang(const vector<int>& fs, const vector<int>& aps) {
     return rang;
 }
 
-vector<int> graphalgo::prufer(const vector<vector<int>>& a) {
+vector<int> graphalgo::prufer(vector<vector<int>> a) {
     int nbSommets = a[0][0];
     // Création du vecteur pour stocker le codage de Prufer
     vector<int> prf (nbSommets - 1);
-    vector<vector<int>> matriceAdj = a;
 
     prf[0] = nbSommets - 2;
     int k = 1;
@@ -140,80 +145,173 @@ vector<int> graphalgo::prufer(const vector<vector<int>>& a) {
     while(k <= nbSommets - 2) {
         // On cherche le premier sommet feuille
         int i = 1;
-        for(; matriceAdj[i][0] != 1; i++);
+        for(; a[i][0] != 1; i++);
 
         // On cherche le voisin du sommet feuille
         int j=1;
-        for(; matriceAdj[i][j] != 1; j++);
+        for(; a[i][j] != 1; j++);
 
         // On stocke du voisin dans le codage de Prufer
         prf[k++] = j;
 
         // On supprime le sommet feuille et ses arêtes
-        matriceAdj[i][j] = 0;
+        a[i][j] = 0;
         // On supprime  l'arête entre le sommet feuille et son voisin
-        matriceAdj[j][i] = 0;
-        matriceAdj[i][0] = 0; // On marque le sommet feuille comme supprimé
-        matriceAdj[j][0]--;
+        a[j][i] = 0;
+        a[i][0] = 0; // On marque le sommet feuille comme supprimé
+        a[j][0]--;
     }
     return prf;
 }
 
-pair<vector<int>, vector<int>> graphalgo::dijsktra(int s, const vector<int>& fs, const vector<int>& aps, const vector<vector<int>>& C) {
-    int v, j, minDist;
-    int nbSommet = aps[0];
-    // Vecteurs pour stocker les distances minimales et les prédécesseurs
-    vector<int> d(nbSommet + 1);
-    vector<int> pred(nbSommet + 1, 0);
-    // Vecteur pour marquer les sommets déjà traités
-    vector<bool> S(nbSommet + 1, true);
-    d[0] = nbSommet;
+inline vector<int> retireIndex(const std::vector<int> &tab, int index)
+{
+    index++;
+    vector<int> res;
+    for(unsigned i = 0; i < tab.size(); i++){
+        if(tab[i] != index)
+            res.push_back(tab[i]);
+    }
+    return res;
+}
 
-    // Initialisation des distances
-    for(int i = 1; i <= nbSommet; i++)
-        d[i] = C[s][i];
+graphalgo::graph graphalgo::dijkstra(int s_depart, graphalgo::graph &g)
+{
+    const int nb_sommets = g.n();
 
-    // Marquer le sommet source comme traité et sa distance à lui-même égale à 0
-    S[s] = false;
+    // On récupère fs-aps et la matrice des coûts
+    std::vector<int> fs, aps;
+    g.fs_aps(fs, aps);
+    std::vector<vector<int>> matCout = g.cost_matrice();
+
+    // On déclare et initialise les variables tampons
+    vector<int> d(nb_sommets, graphalgo::MAXPOIDS), pred(nb_sommets, -1);
+    d[s_depart - 1] = 0;
+    pred[s_depart - 1] = 0;
+
+    // On déclare un tableau indiquant les sommets non-parcourus
+    vector<int> sommets_non_traites(nb_sommets);
+    for(int i = 0; i < nb_sommets; i++)
+        sommets_non_traites[i] = i + 1;
+
+
+    // On traite le sommet dont la distance est la plus petite
+    for(int i = 0; i < nb_sommets; i++){
+        // On déclare des variables tampons pour chercher le sommet de travail (plus courte distance)
+        int s_courant = graphalgo::MAXPOIDS, distSommet = graphalgo::MAXPOIDS;
+        bool inacessible = true;
+
+        // On cherche le sommet de travail
+        for(unsigned j = 0; j < sommets_non_traites.size(); j++){
+            int s = sommets_non_traites[j] - 1;
+            if(d[s] < distSommet){
+                s_courant = s;
+                distSommet = d[s];
+                // Il reste au moins un sommet accessible
+                inacessible = false;
+            }
+        }
+
+        // Je vérifie que les sommets restant sont accessibles
+        if(!inacessible){
+            // On traite les successeurs du sommet de travail
+            int indice = aps[s_courant + 1];
+            while(fs[indice] != 0){
+                // On récupère les sonnées
+                int sommet_successeur = fs[indice] - 1;
+                int c_sommet = d[s_courant];
+                int c_chemin = matCout[s_courant][sommet_successeur];
+
+                // On test si le nouveau chemin est plus court
+                if(c_sommet + c_chemin < d[sommet_successeur]){
+                    // On implémente
+                    d[sommet_successeur] = c_sommet + c_chemin;
+                    pred[sommet_successeur] = s_courant + 1;
+                }
+                indice++;
+            }
+        }
+
+        // sommets_non_traites.erase(sommets_non_traites.begin() + s_courant);
+        sommets_non_traites = retireIndex(sommets_non_traites, s_courant);
+    }
+
+
+    // On déclare le graph réduit
+    graphalgo::graph newG = graphalgo::graph(nb_sommets, g.oriented());
+    // On remplit newG
+    for(int i = 0; static_cast<unsigned>(i) < pred.size(); i++){
+        if(pred[i] != i + 1)
+            newG.add_successor(pred[i], i + 1, d[i]);
+    }
+    // On retourne le graph réduit
+    return newG;
+}
+
+/*graphalgo::graph dijkstra(int s, graphalgo::graph &g) {
+    int ind;
+    int i, j, k, v, m;
+    bool oriented = g.oriented();
+    std::vector<int> fs, aps;
+    g.fs_aps(fs, aps);
+    std::vector<std::vector<int>> p = g.cost_matrice();
+    int n = aps[0];
+    m = fs[0];
+
+    // Initialiser les tableaux et structures de données
+    std::vector<int> pr(n + 1, -1);
+    std::vector<int> d(n + 1, graphalgo::MAXPOIDS);
+    std::vector<int> inS(n + 1, 1); // 1 pour les sommets à traiter
+
+    for (i = 0;i < n; i++)
+        d[i+1] = p[s-1][i];
+
+    // Initialiser les tableaux de résultats
     d[s] = 0;
+    pr[s] = 0;
+    inS[s] = 0; // Marquer le sommet 's' comme traité
+    ind = n - 1; // Nombre d'éléments restants à traiter
 
-    // Boucle principale
-    for(int cpt = 0; cpt < nbSommet; cpt++) {
-        // Initialisation de la distance minimale à MAXPOIDS
-        minDist = graphalgo::MAXPOIDS;
-
-        // Recherche du sommet non traité avec la plus petite distance actuelle
-        for(int i = 1; i <= nbSommet; i++) {
-            if(S[i] && d[i] < minDist) {
-                minDist = d[i];
+    while (ind > 0) {
+        // Trouver le sommet non traité avec la plus petite distance
+        m = graphalgo::MAXPOIDS;
+        for (int i = 1; i <= n; i++) {
+            if (inS[i] == 1 && d[i] < m) {
+                m = d[i];
                 j = i;
             }
         }
 
-        // Si la distance minimale est toujours MAXPOIDS, on arrête le traitement
-        if(d[j] != graphalgo::MAXPOIDS) {
-            // Marquer le sommet sélectionné comme traité
-            S[j] = false;
+        // S'il n'y a plus de sommets à traiter, terminer
+        if (m == graphalgo::MAXPOIDS) break;
 
-            // Mise à jour des distances des voisins du sommet sélectionné
-            for(int l = aps[j]; fs[l] != 0; l++) {
-                int k = fs[l];
-                if(S[k]) {
-                    v = d[j] + C[j][k]; // Calcul du nouveau poids potentiel
-                    if(v < d[k]) {
-                        d[k] = v; // Mise à jour de la distance minimale
-                        pred[k] = j; // Mise à jour du prédécesseur
-                    }
+        inS[j] = 0; // Marquer le sommet 'j' comme traité
+        ind--;
+
+        // Mettre à jour les distances et les prédécesseurs pour les successeurs de 'j'
+        k = aps[j];
+        while (fs[k] != 0) {
+            if (inS[fs[k]] == 1) {
+                v = d[j] + p[j-1][fs[k]-1];
+                if (v < d[fs[k]]) {
+                    d[fs[k]] = v;
+                    pr[fs[k]] = j;
                 }
             }
-        } else {
-            break; // Si la distance minimale est toujours infinie, on arrête le traitement
+            k++;
         }
     }
 
-    // On retourne les vecteurs de prédécesseurs et de distances minimales
-    return make_pair(pred, d);
-}
+    // Construction du graphe résultant à partir des prédécesseurs
+    graphalgo::graph result(n, oriented);
+    for (int i = 1; i <= n; i++) {
+        if (pr[i] != -1) {
+            result.add_successor(pr[i], i, d[i]);
+        }
+    }
+
+    return result;
+}*/
 
 vector<vector<int>> graphalgo::dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout)
 {
@@ -290,10 +388,10 @@ void graphalgo::fusion(int s, int t, vector<int>& prem, vector<int>& pilch, vect
     pilch[x] = prem[ct];
 }
 
-void graphalgo::kruskal(const graphalgo::graph& G, graphalgo::graph& T) {
+graphalgo::graph graphalgo::kruskal(const graphalgo::graph& G) {
     int nbSommets = G.n();
     // Initialiser T avec le même nombre de noeuds et orientation que G
-    T = graphalgo::graph(nbSommets, G.oriented());
+    graphalgo::graph T = graphalgo::graph(nbSommets, G.oriented());
 
     // On initialise les tableaux tampons
     vector<int> prem(nbSommets + 1);
@@ -325,4 +423,96 @@ void graphalgo::kruskal(const graphalgo::graph& G, graphalgo::graph& T) {
             if(k == nbSommets - 1) break;
         }
     }
+
+    return T;
+}
+
+
+
+void graphalgo::traversee(int s, int &k, int &p, const std::vector<int> &fs, const std::vector<int> &aps, std::vector<int>& prem, std::vector<int>& pilch, std::vector<int>& cfc, std::vector<int>& pred, std::vector<int>& tarj, std::vector<bool>& entarj, std::vector<int>& num, std::vector<int>& ro)
+{
+    int t, u;
+    // numérote s et initialise ro[s]
+    p++;
+    num[s] = p;
+    ro[s] = p;
+    empiler(s, tarj);
+    entarj[s] = true;
+    for (int k = aps[s]; (t=fs[k]) != 0 ; k++) {
+        if (num[t] == 0) { // si t n'est pas encore numéroté
+            pred[t] = s;
+            traversee(t, k, p, fs, aps, prem, pilch, cfc, pred, tarj, entarj, num, ro);
+            if (ro[t] < ro[s]) ro[s] = ro[t]; // Z1
+        } else {
+            if ((num[t] < ro[s]) && entarj[t]) ro[s] = num[t]; // Z2
+        }
+    }
+
+    if (ro[s] == num[s]) {
+        k++;
+        do {
+            u = depiler(tarj);
+            entarj[u] = false;
+            empiler(u, pilch);
+            cfc[u] = k;
+        } while (u != s);
+        prem[k] = pilch[0];
+        pilch[0] = 0;
+    }
+}
+
+void graphalgo::fortconnexe(const std::vector<int>& fs, const std::vector<int>& aps, std::vector<int>& prem, std::vector<int>& pilch, std::vector<int>& cfc, std::vector<int>& pred)
+{
+    int n = aps[0];
+    prem.resize(n + 1);
+    pilch.resize(n + 1);
+    cfc.resize(n + 1);
+    pred.resize(n + 1, 0);
+
+    std::vector<int> tarj(n + 1);
+    std::vector<bool> entarj(n + 1, false);
+    std::vector<int> num(n + 1, 0);
+    std::vector<int> ro(n + 1, 0);
+
+    int p = 0;
+    int k = 0;
+
+    pilch[0] = 0;
+    tarj[0] = 0;
+
+    for (int s = 1; s <= n; s++)
+        if (num[s] == 0)
+            traversee(s, k, p, fs, aps, prem, pilch, cfc, pred, tarj, entarj, num, ro);
+
+    prem[0] = k;
+}
+
+graphalgo::graph graphalgo::graph_reduit(const std::vector<int>& prem, const std::vector<int>& pilch, const std::vector<int>& cfc, const std::vector<int>& fs, const std::vector<int>& aps) {
+    int s, kr = 1, k, t, nbc = prem[0];
+    std::vector<bool> deja_mis(nbc + 1, false);
+    vector<int> fsr(fs[0] + 1);
+    vector<int> apsr(nbc + 1);
+    apsr[0] = nbc;
+
+    for (int i = 1; i <= nbc; i++) {
+        apsr[i] = kr;
+        deja_mis[i] = true;
+        s = prem[i];
+        while (s != 0) {
+            for (int k = aps[s]; (t = fs[k]) != 0; k++) {
+                if (deja_mis[cfc[t]] == false) {
+                    fsr[kr] = cfc[t];
+                    kr++;
+                    deja_mis[cfc[t]] = true;
+                }
+            }
+            s = pilch[s];
+        }
+        fsr[kr] = 0;
+        kr++;
+    }
+    fsr[0] = kr - 1;
+
+    graphalgo::graph gr{fsr, apsr};
+    return gr;
 }

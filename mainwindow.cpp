@@ -3,23 +3,26 @@
 #include "composents/vertexinput.h"
 #include "composents/matadjinput.h"
 #include "composents/graphview.h"
+#include "composents/outputalgo.h"
 #include <fstream>
 #include <QScreen>
 #include <QWidget>
 #include <QBoxLayout>
 #include <QComboBox>
 #include <QPushButton>
-#include <QButtonGroup>
 #include <QList>
 #include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
+
+#include <string>
 
 // CONSTRUCTEURS
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
 {
+    // loadGraph();
     createInterface();
 }
 
@@ -28,8 +31,6 @@ MainWindow::~MainWindow()
     // Delete les pointeurs
     delete d_listeAlgorithmes;
     delete d_buttonLancerAlgo;
-    delete d_saisieGroup;
-    delete fichierGroup;
     delete d_graphview;
     if (d_currentInputWindow) {
         d_currentInputWindow->close();
@@ -41,15 +42,16 @@ MainWindow::~MainWindow()
 
 void MainWindow::createInterface()
 {
+    // On paramètre les dimensons de l'interface
     QScreen *screen = QGuiApplication::primaryScreen();
     QRect  screenGeometry = screen->geometry();
     int height = screenGeometry.height();
     int width = screenGeometry.width();
-    setMinimumSize(width -600, height- 200);
+    setMinimumSize(width - (width * 0.20), height - (height * 0.2));
+
     // On crée le widget principal
     auto mainWidget {new QWidget{this}};
     this->setCentralWidget(mainWidget);
-
     // On crée et implémente le layout vertical central
     auto mainVerticalLayout {new QVBoxLayout};
     mainWidget->setLayout(mainVerticalLayout);
@@ -61,11 +63,9 @@ void MainWindow::createInterface()
     // On crére et implémente le layout horithal
     auto horizonthalLayout {new QHBoxLayout};
     mainVerticalLayout->addLayout(horizonthalLayout);
-
     // On crée le QVBoxLayout contenant la liste des algorithmes
     auto listeAlgoLayout {new QVBoxLayout};
     horizonthalLayout->addLayout(listeAlgoLayout);
-
     // On génère la liste des algorithmes
     d_listeAlgorithmes =  new QComboBox{};
     d_listeAlgorithmes->addItem("Calcul des distances");
@@ -73,6 +73,7 @@ void MainWindow::createInterface()
     d_listeAlgorithmes->addItem("Détermination des composantes fortement connexes selon Tarjan");
     d_listeAlgorithmes->addItem("Problème d'ordonnancement");
     d_listeAlgorithmes->addItem("Chemins les plus courts selon Dijkstra");
+    d_listeAlgorithmes->addItem("Chemins les plus courts selon Dantzig");
     d_listeAlgorithmes->addItem("Arbre recouvrant minimal d'un graphe non orienté selon Kruskal");
     d_listeAlgorithmes->addItem("Codage de Prüfer");
     d_buttonLancerAlgo = new QPushButton{"Lancer"};
@@ -84,98 +85,59 @@ void MainWindow::createInterface()
     // On crée et imlémente le layout vertical contenant les boutons d'actions
     auto buttonLayout {new QVBoxLayout};
     horizonthalLayout->addLayout(buttonLayout);
-
-    // On génère les boutons
+    // On génère le bouton de saisie graphique
     auto buttonDessin {new QPushButton{"Dessiner un nouveau graph"}};
-    auto buttonSaisie {new QPushButton{"Saisie textuelle"}};
-    auto buttonFichier {new QPushButton{"Télécharger un fichier"}};
-    auto buttonSauvegarder {new QPushButton{"Sauvegarder le graph"}};
-
-    // On crée le layout contenant les sous-options de saisie textuelle
-    auto buttonSaisieLayout {new QVBoxLayout{}};
-    auto bSaisieFsAps {new QPushButton{"par FS APS"}};
-    auto bSaisieMatriceAdj {new QPushButton{"par matrice d'adjacence"}};
-    auto bSaisieListeSommets {new QPushButton{"par liste de sommets"}};
-
-    buttonSaisieLayout->addWidget(bSaisieFsAps);
-    buttonSaisieLayout->addWidget(bSaisieMatriceAdj);
-    buttonSaisieLayout->addWidget(bSaisieListeSommets);
-    // On génère le groupe de boutons de saisie textuelle
-    d_saisieGroup = new QButtonGroup{};
-    d_saisieGroup->addButton(bSaisieFsAps);
-    d_saisieGroup->addButton(bSaisieMatriceAdj);
-    d_saisieGroup->addButton(bSaisieListeSommets);
-    hideSaisieGroup();
-
-    // On crée le layout contenant les sous-options de saisie par fichier
-    auto buttonFichierLayout {new QVBoxLayout{}};
-    auto bFichierFsAps {new QPushButton{"par FS APS"}};
-    auto bFichierMatriceAdj {new QPushButton{"par matrice d'adjacence"}};
-    buttonFichierLayout->addWidget(bFichierFsAps);
-    buttonFichierLayout->addWidget(bFichierMatriceAdj);
-    // On génère le groupe de boutons de saisie par fichier
-    fichierGroup = new QButtonGroup{};
-    fichierGroup->addButton(bFichierFsAps);
-    fichierGroup->addButton(bFichierMatriceAdj);
-    hideFichierGroup();
-
-    // On implémente le buttonLayout
     buttonLayout->addWidget(buttonDessin);
-    buttonLayout->addWidget(buttonSaisie);
-    buttonLayout->addLayout(buttonSaisieLayout);
+
+    // On génère les options de saisies textuelles
+    auto saisieLayout {new QHBoxLayout};
+    buttonLayout->addLayout(saisieLayout);
+    // On génère la liste déroulante de saisie
+    d_listeSaisie = new QComboBox;
+    d_listeSaisie->addItem("Saisie par FS APS");
+    d_listeSaisie->addItem("Saisie par Matrice d'Adjacence");
+    d_listeSaisie->addItem("Saisie par liste de sommets");
+    // On génère le bouton de saisie
+    auto buttonSaisie {new QPushButton{"Saisir"}};
+    saisieLayout->addWidget(d_listeSaisie);
+    saisieLayout->addWidget(buttonSaisie);
+
+    // On génère le bouton de sauvegarde
+    auto buttonFichier {new QPushButton{"Télécharger un graph"}};
     buttonLayout->addWidget(buttonFichier);
-    buttonLayout->addLayout(buttonFichierLayout);
+    // On génère le bouton de sauvegarde
+    auto buttonSauvegarder {new QPushButton{"Sauvegarder le graph"}};
     buttonLayout->addWidget(buttonSauvegarder);
 
-    // On connecte les boutons à leur action
-    // connect(buttonDessin, &QPushButton::clicked, this, ...);
+
+    connect(buttonDessin, &QPushButton::clicked, this, &MainWindow::onDessine);
     connect(buttonSaisie, &QPushButton::clicked, this, &MainWindow::onSaisie);
-    connect(buttonFichier, &QPushButton::clicked, this, &MainWindow::onFichier);
-
-    connect(bSaisieFsAps, &QPushButton::clicked, this, &MainWindow::onSaisieFsAps);
-    connect(bSaisieMatriceAdj, &QPushButton::clicked, this, &MainWindow::onSaisieMatAdj);
-    connect(bSaisieListeSommets, &QPushButton::clicked, this, &MainWindow::onSaisieListeSommets);
-
-    connect(bFichierFsAps, &QPushButton::clicked, this, &MainWindow::onFichierFsAps);
-    // connect(bFichierMatriceAdj, &QPushButton::clicked, this, ...);
-
+    connect(buttonFichier, &QPushButton::clicked, this, &MainWindow::onTelecharge);
     connect(buttonSauvegarder, &QPushButton::clicked, this, &MainWindow::onSauvegarde);
+
+    connect(d_buttonLancerAlgo, &QPushButton::clicked, this, &MainWindow::onExecAlgo);
 }
 
-// SHOW / HIDE
-
-void MainWindow::showSaisieGroup()
+void MainWindow::loadGraph()
 {
-    QList<QAbstractButton*> buttons = d_saisieGroup->buttons();
-    for(auto b : buttons)
-        b->setVisible(true);
+    // On initialise le flux de lecture
+    std::string source{"./assets/graph_courant.graph"};
+    std::ifstream import_graph_courant {source};
+
+    // On test la lecture
+    if(import_graph_courant.good()){
+        // On importe le graph courant
+        graphalgo::graph g{};
+        g.load(import_graph_courant);
+        d_graph = g;
+
+    // Sinon
+    } else QMessageBox::critical(this, "Erreur de lecture", "Le fichier graph_courant.graph est introuvable");
 }
 
-void MainWindow::showFichierGroup()
+void MainWindow::setOptions() const
 {
-    QList<QAbstractButton*> buttons = fichierGroup->buttons();
-    for(auto b : buttons)
-        b->setVisible(true);
-}
 
-void MainWindow::hideSaisieGroup()
-{
-    QList<QAbstractButton*> buttons = d_saisieGroup->buttons();
-    for(auto b : buttons)
-        b->setVisible(false);
-}
-
-void MainWindow::hideFichierGroup()
-{
-    QList<QAbstractButton*> buttons = fichierGroup->buttons();
-    for(auto b : buttons)
-        b->setVisible(false);
-}
-
-void MainWindow::hideButtonGroup()
-{
-    hideSaisieGroup();
-    hideFichierGroup();
 }
 
 // MÉTHODES ONCLIC
@@ -193,30 +155,38 @@ void MainWindow::onGrapheReceived(const graphalgo::graph& g)
     }
 }
 
-void MainWindow::onSaisie()
-{
-    if(saisieGroupVisible){
-        saisieGroupVisible = false;
-        this->hideSaisieGroup();
-    } else {
-        saisieGroupVisible = true;
-        this->showSaisieGroup();
-    }
+void MainWindow::onExecAlgo() {
+    int i = d_listeAlgorithmes->currentIndex();
+    auto output {new outputAlgo{i, d_graph}};
+    output->show();
 }
 
-void MainWindow::onFichier()
+void MainWindow::onDessine()
 {
-    if(fichierGroupVisible){
-        fichierGroupVisible = false;
-        this->hideFichierGroup();
-    } else {
-        fichierGroupVisible = true;
-        this->showFichierGroup();
+    // à compléter
+}
+
+void MainWindow::onSaisie()
+{
+    int i = d_listeSaisie->currentIndex();
+    switch (i)
+    {
+        case 0 :
+            onSaisieFsAps();
+            break;
+
+        case 1 :
+            onSaisieMatAdj();
+            break;
+
+        case 2 :
+            onSaisieListeSommets();
+            break;
+
     }
 }
 
 void MainWindow::onSaisieMatAdj() {
-    hideButtonGroup();
     // On crée la fenêtre
     d_currentInputWindow = new matAdjInput{};
 
@@ -228,7 +198,6 @@ void MainWindow::onSaisieMatAdj() {
 
 void MainWindow::onSaisieFsAps()
 {
-    hideButtonGroup();
     // On crée la fenêtre
     d_currentInputWindow = new fsapsInput{};
     // On connecte le signal transmis après la création
@@ -239,7 +208,6 @@ void MainWindow::onSaisieFsAps()
 
 void MainWindow::onSaisieListeSommets()
 {
-    hideButtonGroup();
     // On crée la fenêtre
     d_currentInputWindow = new vertexInput{};
     // On connecte le signal transmis après la création
@@ -248,60 +216,66 @@ void MainWindow::onSaisieListeSommets()
     d_currentInputWindow->show();
 }
 
-void MainWindow::onFichierFsAps()
+void MainWindow::onTelecharge()
 {
-    hideButtonGroup();
-
-    // Ouvrir une boîte de dialogue pour sélectionner le fichier
-    QString fileName = QFileDialog::getOpenFileName(this, "Sélectionner un fichier FS-APS", "", "Fichiers texte (*.txt)");
+    // On ouvre une boîte de dialogue pour permettre à l'utilisateur de choisir le fichier
+    QString fileName = QFileDialog::getOpenFileName(this, "Sauvegarder le graphe", "", "Fichiers texte (*.graph)");
     if(fileName.isEmpty()) {
-        return; // L'utilisateur a annulé la sélection
+        return; // L'utilisateur a annulé la sauvegarde
     }
 
-    // Lire le contenu du fichier
+    // On ouvre le fichier en écriture
     QFile file(fileName);
     if(!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QMessageBox::critical(this, "Erreur de lecture", "Impossible d'ouvrir le fichier.");
-        return;
-    }
+        QMessageBox::critical(this, "Erreur de lecture", "Impossible d'ouvrir le fichier en lecture.");
 
-    QTextStream in(&file);
-    QString fsLine = in.readLine();
-    QString apsLine = in.readLine();
-
-    // Vérifier la validité des données
-    std::vector<int> fs, aps;
-    if(!validationFsAps(fsLine, apsLine, fs, aps)) {
+    } else {
+        QTextStream in(&file);
+        QString fileContent = in.readAll();
         file.close();
-        return;
+
+        if (fileContent.isEmpty()) {
+            QMessageBox::critical(this, "Erreur de lecture", "Le fichier sélectionné est vide.");
+
+        } else {
+            std::ifstream ifs {fileName.toStdString()};
+            if(ifs.good()){
+                graphalgo::graph g{};
+                g.load(ifs);
+                d_graph = g;
+                // On met à jour l'affichage
+                d_graphview->graphChanged(g);
+            } else {
+                QMessageBox::critical(this, "Erreur d'importation", "Impossible de lire le fichier.");
+            }
+        }
     }
-
-
-    // Construire le graphe à partir de FS et APS
-    graphalgo::graph g{fs, aps};
-
-    // Émettre le graphe
-    onGrapheReceived(g);
-
     file.close();
 }
 
 void MainWindow::onSauvegarde()
 {
-    // Ouvrir une boîte de dialogue pour permettre à l'utilisateur de choisir le fichier
-    QString fileName = QFileDialog::getSaveFileName(this, "Sauvegarder le graphe", "", "Fichiers texte (*.txt)");
+    // On ouvre une boîte de dialogue pour permettre à l'utilisateur de choisir le fichier
+    QString fileName = QFileDialog::getSaveFileName(this, "Sauvegarder le graphe", "", "Fichiers texte (*.graph)");
     if(fileName.isEmpty()) {
         return; // L'utilisateur a annulé la sauvegarde
     }
 
-    // Ouvrir le fichier en écriture
+    // On vérifie que l'utilisateur a choisi un fichier compatible
+    QString extension {".graph"};
+    if(!fileName.endsWith(extension)) {
+        fileName += extension;
+    }
+
+    // On ouvre le fichier en écriture
     QFile file(fileName);
     if(!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
         QMessageBox::critical(this, "Erreur d'écriture", "Impossible d'ouvrir le fichier en écriture.");
-        return;
-    }
 
-    std::ofstream ofs(fileName.toStdString());
-    d_graph.save(ofs);
+    // On écrit
+    } else {
+        std::ofstream ofs(fileName.toStdString());
+        d_graph.save(ofs);
+    }
     file.close();
 }

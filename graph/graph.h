@@ -181,7 +181,6 @@ namespace graphalgo
             void mat_adj_not_oriented(vector<vector<int>>& mat_adj);
             // @brief create an adjacency matrix for an oriented graph
             void mat_adj_oriented(vector<vector<int>>& mat_adj);
-
     };
 }
 

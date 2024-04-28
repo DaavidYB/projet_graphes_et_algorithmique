@@ -8,6 +8,10 @@
 
 class QComboBox;
 class QPushButton;
+
+/**
+ * @brief Fenêtre principale de l'application
+ */
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -24,23 +28,19 @@ private:
      * @brief Le graph courant qui s'affiche
      */
     // graphalgo::graph d_graph;
-    // !! TEMPORAIRE !! //
-    vector<int> FS = {31, 2, 3, 0, 4, 9, 0, 4, 6, 8, 0, 8, 9, 11, 0, 3, 6, 0, 7, 8, 0, 8, 0, 10, 0, 0, 11, 0, 10, 12, 0, 0};
-    vector<int> APS = {12, 1, 4, 7, 11, 15, 18, 21, 23, 25, 26, 28, 31};
-    graphalgo::graph d_graph{FS, APS};
+    graphalgo::graph d_graph{
+        {31, 2, 3, 0, 4, 9, 0, 4, 6, 8, 0, 8, 9, 11, 0, 3, 6, 0, 7, 8, 0, 8, 0, 10, 0, 0, 11, 0, 10, 12, 0, 0},
+        {12, 1, 4, 7, 11, 15, 18, 21, 23, 25, 26, 28, 31}
+    };
 
     /**
      * @brief La liste des algorithmes
      */
-    QComboBox *d_listeAlgorithmes;
+    QComboBox *d_listeAlgorithmes, *d_listeSaisie;
     /**
      * @brief Le bouton lançant l'algorithme sélectionné
      */
     QPushButton *d_buttonLancerAlgo;
-    /**
-     * @brief Group de boutons regroupant les différentes options de saisies textuelles / par fichiers
-     */
-    QButtonGroup *d_saisieGroup, *fichierGroup;
     /**
      * @brief Pointeur vers le widget de la fenêtre de saisie en cours
      */
@@ -56,25 +56,13 @@ private:
     graphView *d_graphview;
 
     /**
-     * @brief Méthode privée montrant les sous-options de saisies textuelles
+     * @brief Méthode privée chargeant le graph par défaut
      */
-    void showSaisieGroup();
+    void loadGraph();
     /**
-     * @brief Méthode privée montrant les sous-options de saisies par fichiers
+     * @brief Méthode privée permettant d'adapter la sélectioner d'algorithmes (d_listeAlgorithmes) au graph courant (d_graph)
      */
-    void showFichierGroup();
-    /**
-     * @brief Méthode privée cachant les sous-options de saisies textuelles
-     */
-    void hideSaisieGroup();
-    /**
-     * @brief Méthode privée cachant les sous-options de saisies par fichiers
-     */
-    void hideFichierGroup();
-    /**
-     * @brief Méthode privée cachant tous les groupes de boutons
-     */
-    void hideButtonGroup();
+    void setOptions() const;
 
 private slots:
     /**
@@ -82,14 +70,21 @@ private slots:
      * @param g - le graphe reçu
      */
     void onGrapheReceived(const graphalgo::graph& g);
+
     /**
-     * @brief Méthode privée réagissant au clic du bouton buttonSaisie
+     * @brief Méthode privée réagissant au clic du bouton d_buttonLancerAlgo et permettant l'exécution de l'algorithme choisi
+     */
+    void onExecAlgo();
+
+    /**
+     * @brief Méthode privée réagissant au clic du bouton buttonDessin et permetttant la saisie graphique d'un graph
+     */
+    void onDessine();
+    /**
+     * @brief Méthode privée réagissant au clic du bouton buttonSaisie et permettant la saisie textuelle d'un graph
      */
     void onSaisie();
-    /**
-     * @brief Méthode privée réagissant au clic du bouton buttonFichier
-     */
-    void onFichier();
+
     /**
      * @brief Méthoed privée réagissant au clic du bouton bSaisieFsAps
      */
@@ -102,12 +97,13 @@ private slots:
      * @brief Méthoed privée réagissant au clic du bouton bSaisieListeSommets
      */
     void onSaisieListeSommets();
+
     /**
-     * @brief Méthode privée permettant la saisie d'un graphe par FS_APS à partir d'un fichier
+     * @brief Méthode privée réagissant au clic du bouton buttonFichier et permettant le téléchargement d'un graphe
      */
-    void onFichierFsAps();
+    void onTelecharge();
     /**
-     * @brief Méthode privée permettant la sauvegarde d'un graphe
+     * @brief Méthode privée réagissant au clic du bouton buttonSauvegarder et permettant la sauvegarde d'un graphe
      */
     void onSauvegarde();
 };
