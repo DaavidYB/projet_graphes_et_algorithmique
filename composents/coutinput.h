@@ -12,6 +12,7 @@ class coutInput : public QWidget
     Q_OBJECT
 
     friend class fsapsInput;
+    friend class matAdjInput;
 
 public:
     /**

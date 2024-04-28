@@ -40,6 +40,7 @@ void coutInput::createInterface()
     separationLine->setFrameStyle(QFrame::HLine|QFrame::Sunken);
     d_mainLayout->addWidget(separationLine);
 
+    // À optimiser pour fs aps
     if(fs.size() > 0) {
         // createInterfaceFSAPS();
         graphalgo::graph g{fs, aps};
@@ -129,9 +130,10 @@ void coutInput::createGraph()
     for(int lignes = 0; lignes < matAdj[0][0]; lignes++) {
         for(int colonnes = 0; colonnes < matAdj[0][0]; colonnes++) {
             // S'il existe une liaison
-            if(matAdj[lignes][colonnes] != 0) {
+            if(matAdj[lignes + 1][colonnes + 1] != 0) {
                 // On ajoute le successeur avec le coût saisi dans l'interface
-                newG.add_successor(lignes, colonnes, d_matrice->item(lignes, colonnes)->text().toUInt());
+                int cout = d_matrice->item(lignes, colonnes)->text().toUInt();
+                newG.add_successor(lignes + 1, colonnes + 1, cout);
             }
         }
     }

@@ -41,6 +41,9 @@ private:
      * @brief Attribut privé contenant le bouton clickable indiquant si le grave psosède des coûts
      */
     QCheckBox *d_checkCouts;
+    /**
+     * @brief Attribut privé contenant le QPushButton validant la saisie
+     */
     QPushButton *d_validateButton;
     /**
      * @brief Attribut privé contenant le coutInput
