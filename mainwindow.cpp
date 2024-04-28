@@ -119,7 +119,7 @@ void MainWindow::createInterface()
 void MainWindow::loadGraph()
 {
     // On initialise le flux de lecture
-    std::string source{"assets/graph_courant.graph"};
+    std::string source{":assets/graph_courant.graph"};
     std::ifstream import_graph_courant {source};
 
     // On test la lecture
@@ -132,6 +132,7 @@ void MainWindow::loadGraph()
     // Sinon
     } else QMessageBox::critical(this, "Erreur de lecture", "Le fichier graph_courant.graph est introuvable");
 }
+
 // MÉTHODES ONCLIC
 
 void MainWindow::onGrapheReceived(const graphalgo::graph& g)
