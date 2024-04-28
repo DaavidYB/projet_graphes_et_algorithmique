@@ -57,6 +57,10 @@ private:
      * @brief Méthode privée chargeant le graph par défaut
      */
     void loadGraph();
+    /**
+     * @brief Méthode privée permettant d'adapter la sélectioner d'algorithmes (d_listeAlgorithmes) au graph courant (d_graph)
+     */
+    void setOptions() const;
 
 private slots:
     /**

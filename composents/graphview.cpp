@@ -193,8 +193,10 @@ void graphView::dessineGraph(QPainter &painter)
 void graphView::graphChanged(graphalgo::graph &g)
 {
     // On libère la mémoire allouée
-    d_listeNoeuds.clear();
-    d_graph = g;
+    if(!(d_graph == g)){
+        d_listeNoeuds.clear();
+        d_graph = g;
+    }
     // On redessine le QWidget
     update();
 }

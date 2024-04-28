@@ -510,4 +510,53 @@ namespace graphalgo
         }
         return *this;
     }
+
+    bool graph::operator==(const graph& g) {
+        // Vérifier si les deux graphes ont le même nombre de nœuds
+        if (this->n() != g.n()) {
+            return false;
+        }
+
+        // Vérifier si les deux graphes ont la même orientation
+        if (this->oriented() != g.oriented()) {
+            return false;
+        }
+
+        // Parcourir tous les nœuds du premier graphe
+        node* n1 = this->d_tete;
+        node* n2 = g.d_tete;
+        while (n1 != nullptr && n2 != nullptr) {
+            // Vérifier si les valeurs des nœuds sont les mêmes
+            if (n1->d_n != n2->d_n) {
+                return false;
+            }
+
+            // Parcourir tous les successeurs du nœud courant
+            node* s1 = n1->d_next_s;
+            node* s2 = n2->d_next_s;
+            while (s1 != nullptr && s2 != nullptr) {
+                // Vérifier si les successeurs ont les mêmes valeurs
+                if (s1->d_next_m->d_n != s2->d_next_m->d_n || s1->d_n != s2->d_n) {
+                    return false;
+                }
+                s1 = s1->d_next_s;
+                s2 = s2->d_next_s;
+            }
+
+            // Vérifier si les deux listes de successeurs ont la même longueur
+            if (s1 != nullptr || s2 != nullptr) {
+                return false;
+            }
+
+            n1 = n1->d_next_m;
+            n2 = n2->d_next_m;
+        }
+
+        // Vérifier si les deux listes de nœuds ont la même longueur
+        if (n1 != nullptr || n2 != nullptr) {
+            return false;
+        }
+
+        return true;
+    }
 }

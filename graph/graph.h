@@ -166,6 +166,7 @@ namespace graphalgo
             void save(std::ostream& ost) const;
             void load(std::istream& ist);
             graph& operator=(const graph &g);
+            bool operator==(const graph& g);
 
         private:
             // nb of node
@@ -179,7 +180,6 @@ namespace graphalgo
             void mat_adj_not_oriented(vector<vector<int>>& mat_adj);
             // @brief create an adjacency matrix for an oriented graph
             void mat_adj_oriented(vector<vector<int>>& mat_adj);
-
     };
 }
 

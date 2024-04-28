@@ -135,6 +135,11 @@ void MainWindow::loadGraph()
     } else QMessageBox::critical(this, "Erreur de lecture", "Le fichier graph_courant.graph est introuvable");
 }
 
+void MainWindow::setOptions() const
+{
+
+}
+
 // MÉTHODES ONCLIC
 
 void MainWindow::onGrapheReceived(const graphalgo::graph& g)
