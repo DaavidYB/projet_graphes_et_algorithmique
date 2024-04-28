@@ -13,6 +13,9 @@ outputAlgo::outputAlgo(int indiceOutput, graphalgo::graph &g, QWidget *parent)
         case 1:
             rang(g);
             break;
+        case 2:
+            tarjan(g);
+            break;
         case 4:
             dijkstra(g);
         case 6:
@@ -303,5 +306,43 @@ void outputAlgo::calculerDijkstra(graphalgo::graph& g)
 
     // Mettre à jour le graph
     d_graphViewDijkstra->graphChanged(T);
+}
 
+void outputAlgo::tarjan(graphalgo::graph &g) {
+    // Création du layout
+    auto mainLayout = new QVBoxLayout{this};
+
+    // Titre de la fenêtre
+    auto title = new QLabel("Affichage du graphe réduit selon Tarjan");
+    mainLayout->addWidget(title);
+
+    // Ajout d'une ligne de séparation
+    auto separationLine = new QFrame;
+    separationLine->setFrameStyle(QFrame::HLine | QFrame::Sunken);
+    mainLayout->addWidget(separationLine);
+
+    // Récupérer le résultat de Kruskal
+    graphalgo::graph p{8, true};
+    p.add_successor(1, 2);
+    p.add_successor(1, 3);
+    p.add_successor(1, 4);
+    p.add_successor(3, 6);
+    p.add_successor(4, 7);
+    p.add_successor(5, 2);
+    p.add_successor(5, 6);
+    p.add_successor(5, 1);
+    p.add_successor(6, 3);
+    p.add_successor(6, 7);
+    p.add_successor(6, 8);
+    p.add_successor(7, 4);
+    p.add_successor(8, 7);
+
+
+    vector<int> fs, aps, prem, pilch, cfc, pred;
+    p.fs_aps(fs, aps);
+    graphalgo::fortconnexe(fs, aps, prem, pilch, cfc, pred);
+    graphalgo::graph gr = graphalgo::graph_reduit(prem, pilch, cfc, fs, aps);
+
+    auto graphview {new graphView{gr}};
+    mainLayout->addWidget(graphview);
 }

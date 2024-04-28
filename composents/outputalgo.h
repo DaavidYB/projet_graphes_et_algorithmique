@@ -31,6 +31,8 @@ private:
     void dantzig();
     void kruskal(graphalgo::graph &g);
     void prufer(graphalgo::graph& g);
+
+    void tarjan(graphalgo::graph &g);
 };
 
 #endif // OUTPUTALGO_H

@@ -468,3 +468,93 @@ graphalgo::graph graphalgo::kruskal(const graphalgo::graph& G) {
 
     return T;
 }
+
+
+
+void graphalgo::traversee(int s, int &k, int &p, const std::vector<int> &fs, const std::vector<int> &aps, std::vector<int>& prem, std::vector<int>& pilch, std::vector<int>& cfc, std::vector<int>& pred, std::vector<int>& tarj, std::vector<bool>& entarj, std::vector<int>& num, std::vector<int>& ro)
+{
+    int t, u;
+    // numérote s et initialise ro[s]
+    p++;
+    num[s] = p;
+    ro[s] = p;
+    empiler(s, tarj);
+    entarj[s] = true;
+    for (int k = aps[s]; (t=fs[k]) != 0 ; k++) {
+        if (num[t] == 0) { // si t n'est pas encore numéroté
+            pred[t] = s;
+            traversee(t, k, p, fs, aps, prem, pilch, cfc, pred, tarj, entarj, num, ro);
+            if (ro[t] < ro[s]) ro[s] = ro[t]; // Z1
+        } else {
+            if ((num[t] < ro[s]) && entarj[t]) ro[s] = num[t]; // Z2
+        }
+    }
+
+    if (ro[s] == num[s]) {
+        k++;
+        do {
+            u = depiler(tarj);
+            entarj[u] = false;
+            empiler(u, pilch);
+            cfc[u] = k;
+        } while (u != s);
+        prem[k] = pilch[0];
+        pilch[0] = 0;
+    }
+}
+
+void graphalgo::fortconnexe(const std::vector<int>& fs, const std::vector<int>& aps, std::vector<int>& prem, std::vector<int>& pilch, std::vector<int>& cfc, std::vector<int>& pred)
+{
+    int n = aps[0];
+    prem.resize(n + 1);
+    pilch.resize(n + 1);
+    cfc.resize(n + 1);
+    pred.resize(n + 1, 0);
+
+    std::vector<int> tarj(n + 1);
+    std::vector<bool> entarj(n + 1, false);
+    std::vector<int> num(n + 1, 0);
+    std::vector<int> ro(n + 1, 0);
+
+    int p = 0;
+    int k = 0;
+
+    pilch[0] = 0;
+    tarj[0] = 0;
+
+    for (int s = 1; s <= n; s++)
+        if (num[s] == 0)
+            traversee(s, k, p, fs, aps, prem, pilch, cfc, pred, tarj, entarj, num, ro);
+
+    prem[0] = k;
+}
+
+graphalgo::graph graphalgo::graph_reduit(const std::vector<int>& prem, const std::vector<int>& pilch, const std::vector<int>& cfc, const std::vector<int>& fs, const std::vector<int>& aps) {
+    int s, kr = 1, k, t, nbc = prem[0];
+    std::vector<bool> deja_mis(nbc + 1, false);
+    vector<int> fsr(fs[0] + 1);
+    vector<int> apsr(nbc + 1);
+    apsr[0] = nbc;
+
+    for (int i = 1; i <= nbc; i++) {
+        apsr[i] = kr;
+        deja_mis[i] = true;
+        s = prem[i];
+        while (s != 0) {
+            for (int k = aps[s]; (t = fs[k]) != 0; k++) {
+                if (deja_mis[cfc[t]] == false) {
+                    fsr[kr] = cfc[t];
+                    kr++;
+                    deja_mis[cfc[t]] = true;
+                }
+            }
+            s = pilch[s];
+        }
+        fsr[kr] = 0;
+        kr++;
+    }
+    fsr[0] = kr - 1;
+
+    graphalgo::graph gr{fsr, apsr};
+    return gr;
+}
