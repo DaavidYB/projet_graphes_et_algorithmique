@@ -165,7 +165,9 @@ namespace graphalgo
             vector<vector<int>> cost_matrice() const;
             void save(std::ostream& ost) const;
             void load(std::istream& ist);
-            graph& operator=(const graph &g);
+            graph& operator=(const graph& g);
+            bool operator==(const graph& g) const;
+            bool operator!=(const graph& g) const;
 
         private:
             // nb of node

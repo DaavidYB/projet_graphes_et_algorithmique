@@ -510,4 +510,39 @@ namespace graphalgo
         }
         return *this;
     }
+
+    bool graph::operator==(const graph& g) const
+    {
+        if(this == &g)
+            return true;
+
+        if(d_n != g.d_n && d_oriented != g.d_oriented)
+            return false;
+
+        node* crt = d_tete;
+        node* crt2 = g.d_tete;
+
+        while(crt && crt2 && crt->d_n && crt2->d_n)
+        {
+            node* crt_ct = crt->d_next_s;
+            node* crt_ct2 = crt2->d_next_s;
+            while(crt_ct && crt_ct2 && crt_ct->d_n == crt_ct2->d_n && crt_ct->d_next_m->d_n == crt_ct2->d_next_m->d_n)
+            {
+                crt_ct = crt_ct->d_next_s;
+                crt_ct2 = crt_ct2->d_next_s;
+            }
+            if(crt_ct == crt_ct2 && !crt_ct)
+                return true;
+            return false;
+        }
+
+        if(crt == crt2 && !crt)
+            return true;
+        return false;
+    }
+
+    bool graph::operator!=(const graph& g) const
+    {
+        return !((*this) == g);
+    }
 }

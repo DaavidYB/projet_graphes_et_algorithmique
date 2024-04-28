@@ -15,6 +15,8 @@ class MainWindow : public QMainWindow
 public:
     explicit MainWindow(QWidget *parent = nullptr);
     ~MainWindow();
+protected:
+    bool eventFilter(QObject *obj, QEvent *event) override;
 
 private:
     bool saisieGroupVisible = false, fichierGroupVisible = false;

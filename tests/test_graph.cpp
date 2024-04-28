@@ -378,6 +378,43 @@ TEST_CASE("[graph]")
             compare(fs_res, FS);
             compare(aps_res, APS);
         }
+
+        SUBCASE("graph::operator==(&g)")
+        {
+            graphalgo::graph g{}, g2{}, g3{2};
+
+            graphalgo::graph g4{12};
+
+            REQUIRE_EQ(g, g);
+            REQUIRE_EQ(g, g2);
+            REQUIRE_NE(g, g3);
+            REQUIRE_NE(GFSAPS, g4);
+            REQUIRE_NE(GFSAPS, g3);
+
+            g4.add_successor(1, 2);
+            g4.add_successor(1, 3);
+            g4.add_successor(2, 4);
+            g4.add_successor(2, 9);
+            g4.add_successor(3, 4);
+            g4.add_successor(3, 6);
+            g4.add_successor(3, 8);
+            g4.add_successor(4, 8);
+            g4.add_successor(4, 9);
+            g4.add_successor(4, 11);
+            g4.add_successor(5, 3);
+            g4.add_successor(5, 6);
+            g4.add_successor(6, 7);
+            g4.add_successor(6, 8);
+            g4.add_successor(7, 8);
+            g4.add_successor(8, 10);
+            g4.add_successor(10, 11);
+            g4.add_successor(11, 10);
+            g4.add_successor(11, 12);
+
+            REQUIRE_EQ(GFSAPS, g4);
+            
+
+        }
     }
 
     // SUBCASE("Constructeur avec fs aps") {
