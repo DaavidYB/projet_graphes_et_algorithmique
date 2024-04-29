@@ -58,6 +58,12 @@ TEST_CASE("[graph]")
 
     SUBCASE("Methodes")
     {
+        SUBCASE("graph::grapgaveccout")
+        {
+            graphalgo::graph g{FS,APS};
+            REQUIRE_EQ(g.graphaveccout(), true);
+        }
+
         SUBCASE("graph::find(s)")
         {
             REQUIRE_EQ(G1.find(1)->n(), 1);
@@ -278,13 +284,25 @@ TEST_CASE("[graph]")
                         {__INT_MAX__, __INT_MAX__, __INT_MAX__, __INT_MAX__, __INT_MAX__},
                         {__INT_MAX__, __INT_MAX__, __INT_MAX__, __INT_MAX__, __INT_MAX__}
                 };
-
+                // vector<vector<int>> correction = {
+                //         {-__INT_MAX__, -__INT_MAX__, 3, -__INT_MAX__, -__INT_MAX__},
+                //         {1, -__INT_MAX__, -__INT_MAX__, -__INT_MAX__, -__INT_MAX__},
+                //         {-__INT_MAX__, 2, -__INT_MAX__, -__INT_MAX__, -__INT_MAX__},
+                //         {-__INT_MAX__, -__INT_MAX__, -__INT_MAX__, -__INT_MAX__, -__INT_MAX__},
+                //         {-__INT_MAX__, -__INT_MAX__, -__INT_MAX__, -__INT_MAX__, -__INT_MAX__}
+                // };
                 G1.add_successor(1, 2, 1);
                 G1.add_successor(2, 3, 2);
                 G1.add_successor(3, 1, 3);
 
                 matrice = G1.cost_matrice();
 
+                // for(unsigned i = 0; i < matrice.size(); i++){
+                //     for(unsigned j = 0; j < matrice[i].size(); j++){
+                //         std::cout << matrice[i][j]  << " | ";
+                //     }
+                //     std::cout << std::endl;
+                // }
                 REQUIRE_EQ(correction.size(), matrice.size());
                 for (unsigned i = 0; i < correction.size(); i++) {
                     compare(correction[i], matrice[i]);
@@ -292,4 +310,24 @@ TEST_CASE("[graph]")
             }
         }
     }
+
+    // SUBCASE("Constructeur avec fs aps") {
+    //     vector<int> t_fs = {31, 2, 3, 0, 4, 9, 0, 4, 6, 8, 0, 8, 9, 11, 0, 3, 6, 0, 7, 8, 0, 8, 0, 10, 0, 0, 11, 0, 10, 12, 0, 0};
+    //     vector<int> t_aps = {12, 1, 4, 7, 11, 15, 18, 21, 23, 25, 26, 28, 31};
+
+    //     graphalgo::graph g{t_fs, t_aps, true};
+
+    //     vector<int> fs, aps;
+    //     REQUIRE_EQ(G1.n(), 12);
+    //     REQUIRE_EQ(G1.oriented(), true);
+    //     //G1.fs_aps(fs, aps);
+
+    //     // REQUIRE_EQ(t_fs.size(), fs.size());
+    //     // for(int i = 0; i < fs.size(); ++i)
+    //     //     REQUIRE_EQ(t_fs.size(), fs.size());
+
+    //     // REQUIRE_EQ(t_aps.size(), aps.size());
+    //     // for(int i = 0; i < aps.size(); ++i)
+    //     //     REQUIRE_EQ(t_aps.size(), aps.size());
+    // }
 }
