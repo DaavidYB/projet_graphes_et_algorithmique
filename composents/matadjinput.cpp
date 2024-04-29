@@ -1,4 +1,5 @@
 #include "matadjinput.h"
+#include "coutinput.h"
 #include <QBoxLayout>
 #include <QLineEdit>
 #include <QCheckBox>
@@ -8,7 +9,7 @@
 #include <QLabel>
 #include <QFrame>
 
-// CONSTRUCTEURS
+// PUBLIC
 
 matAdjInput::matAdjInput(QWidget *parent)
     : QWidget{parent}
@@ -19,64 +20,104 @@ matAdjInput::matAdjInput(QWidget *parent)
 matAdjInput::~matAdjInput()
 {
     // delete les pointeurs
+    delete d_mainLayout;
+    delete d_preSaisieLayout;
+    delete d_valideLayout;
+    delete d_horizonthalLayout;
+    delete d_coutLayout;
+    delete d_lNbSommets;
+    delete d_lOrientation;
+    delete d_inputnbSommets;
     delete d_radioButtonOriente;
+    delete d_bValide;
     delete d_matrice;
 }
 
-// CRÉATION DE L'INTERFACE
+// PRIVÉ
 
 void matAdjInput::createInterface()
 {
     // On génère le layout principal
-    auto mainLayout {new QVBoxLayout{this}};
+    d_mainLayout = new QVBoxLayout{this};
 
     // On ajoute le titre
     auto title {new QLabel{"Saisie d'un graph selon une matrice d'adjacence"}};
-    mainLayout->addWidget(title);
+    d_mainLayout->addWidget(title);
 
     // On ajoute la ligne de séparation
     auto titleLigne {new QFrame{this}};
     titleLigne->setFrameStyle(QFrame::HLine|QFrame::Sunken);
-    mainLayout->addWidget(titleLigne);
+    d_mainLayout->addWidget(titleLigne);
 
     // On génère un QHBoxLayout pour les données de pré-saisie
-    auto preSaisieLayout {new QHBoxLayout{}};
-    mainLayout->addLayout(preSaisieLayout);
+    d_preSaisieLayout = new QHBoxLayout{};
+    d_mainLayout->addLayout(d_preSaisieLayout);
 
     // On génère les inputs et bales de saisie
-    auto lNbSommets {new QLabel{"Saisir le nombre de sommets : "}};
-    preSaisieLayout->addWidget(lNbSommets);
-    auto inputnbSommets{new QLineEdit{}};
-    preSaisieLayout->addWidget(inputnbSommets);
-    auto lOrientation {new QLabel{"Orienté : "}};
-    preSaisieLayout->addWidget(lOrientation);
+    d_lNbSommets = new QLabel{"Saisir le nombre de sommets : "};
+    d_preSaisieLayout->addWidget(d_lNbSommets);
+    d_inputnbSommets = new QLineEdit{};
+    d_preSaisieLayout->addWidget(d_inputnbSommets);
+    d_lOrientation = new QLabel{"Orienté : "};
+    d_preSaisieLayout->addWidget(d_lOrientation);
     d_radioButtonOriente  = new QCheckBox{};
-    preSaisieLayout->addWidget(d_radioButtonOriente);
+    d_preSaisieLayout->addWidget(d_radioButtonOriente);
+
+    d_coutLayout = new QHBoxLayout{};
+    d_mainLayout->addLayout(d_coutLayout);
+    d_labelCout = new QLabel{"Avec coûts :"};
+    d_coutLayout->addWidget(d_labelCout);
+    d_checkCouts = new QCheckBox{};
+    d_coutLayout->addWidget(d_checkCouts);
+    d_coutLayout->addStretch(1);
 
     // On génère le layout horizonthal contenant la matrice et le bouton de validation
-    auto horizonthalLayout {new QHBoxLayout{}};
-    mainLayout->addLayout(horizonthalLayout);
+    d_horizonthalLayout = new QHBoxLayout{};
+    d_mainLayout->addLayout(d_horizonthalLayout);
 
     // On génère la matrice
     d_matrice = new QTableWidget{};
-    horizonthalLayout->addWidget(d_matrice);
+    d_horizonthalLayout->addWidget(d_matrice);
 
     // On génère le layout contenant le bouton de validation
-    auto valideLayout {new QVBoxLayout};
-    horizonthalLayout->addLayout(valideLayout);
+    d_valideLayout = new QVBoxLayout{};
+    d_horizonthalLayout->addLayout(d_valideLayout);
 
     // On génère le bouton de validation
-    auto bValide {new QPushButton{"Valider"}};
-    valideLayout->addStretch(1);
-    valideLayout->addWidget(bValide);
+    d_bValide = new QPushButton{"Valider"};
+    d_valideLayout->addStretch(1);
+    d_valideLayout->addWidget(d_bValide);
 
-    connect(inputnbSommets, &QLineEdit::textChanged, [=](const QString &text) {
+    connect(d_inputnbSommets, &QLineEdit::textChanged, [=](const QString &text) {
         bool ok;
         unsigned value = text.toUInt(&ok);
 
         if (ok) onNbSommets(value);
     });
-    connect(bValide, &QPushButton::clicked, this, &matAdjInput::createGraph);
+    connect(d_bValide, &QPushButton::clicked, this, &matAdjInput::createGraph);
+}
+
+void matAdjInput::updateInterface(const vector<vector<int>> &matAdj)
+{
+    bool oriented = d_radioButtonOriente->isChecked();
+
+    delete d_preSaisieLayout;
+    delete d_valideLayout;
+    delete d_horizonthalLayout;
+    delete d_lNbSommets;
+    delete d_lOrientation;
+    delete d_inputnbSommets;
+    delete d_radioButtonOriente;
+    delete d_bValide;
+    delete d_matrice;
+
+    d_coutinput = new coutInput{matAdj, oriented};
+    d_mainLayout->addWidget(d_coutinput);
+    d_bValide = new QPushButton{"Valider"};
+    d_mainLayout->addWidget(d_bValide);
+
+    connect(d_coutinput, &coutInput::graphe, this, &matAdjInput::onGraphReceived);
+    connect(d_bValide, &QPushButton::clicked, d_coutinput, &coutInput::createGraph);
 }
 
 void matAdjInput::createMatrice(unsigned i)
@@ -84,6 +125,12 @@ void matAdjInput::createMatrice(unsigned i)
     // On alloue les lignes et colonnes
     d_matrice->setColumnCount(i);
     d_matrice->setRowCount(i);
+
+    for(unsigned j = 0; j < i; j++) {
+        // On définit la taille des cases
+        d_matrice->setColumnWidth(j,30);
+        d_matrice->setRowHeight(j, 30);
+    }
 
     // On génère les cases
     for(unsigned lignes = 0; lignes < i; lignes++){
@@ -155,11 +202,20 @@ void matAdjInput::createGraph()
     if(recupereValide(matAdj)){
         // Graph orienté
         if(d_radioButtonOriente->isChecked()){
-            graphalgo::graph g{matAdj};
-            emit graphe(g);
+            if(d_checkCouts->isChecked()){
+                updateInterface(matAdj);
 
-            // Graph non-orienté
-        }  else {
+            } else {
+                graphalgo::graph g{matAdj};
+                emit graphe(g);
+            }
+
+        // Graph non-orienté avec coûts
+        }  else if(d_checkCouts->isChecked()){
+            updateInterface(matAdj);
+
+        // Graph non-orienté sans coûts
+        } else {
             graphalgo::graph g{matAdj};
             emit graphe(g);
         }
@@ -168,10 +224,16 @@ void matAdjInput::createGraph()
     }
 }
 
-// MÉTHODES ONCLIC
+// PRIVATE SLOTS
 
 void matAdjInput::onNbSommets(unsigned i)
 {
     deleteMatrice();
     createMatrice(i);
 }
+
+void matAdjInput::onGraphReceived(graphalgo::graph &g)
+{
+    emit graphe(g);
+}
+

@@ -171,9 +171,12 @@ std::vector<graphNode> graphView::calculePositions(std::vector<graphalgo::vtx> v
 
 void graphView::dessineGraph(QPainter &painter)
 {
-     std::vector<graphalgo::vtx> vtxs = d_graph.vertexes();
-    // Récupérer les positions des nœuds
-    d_listeNoeuds = calculePositions(vtxs);
+    std::vector<graphalgo::vtx> vtxs = d_graph.vertexes();
+
+    if(d_listeNoeuds.size() == 0){
+        // Récupérer les positions des nœuds
+        d_listeNoeuds = calculePositions(vtxs);
+    }
 
     // On dessine les nœuds
     for(const auto item : d_listeNoeuds)
@@ -190,8 +193,10 @@ void graphView::dessineGraph(QPainter &painter)
 void graphView::graphChanged(graphalgo::graph &g)
 {
     // On libère la mémoire allouée
-    d_listeNoeuds.clear();
-    d_graph = g;
+    if(!(d_graph == g)){
+        d_listeNoeuds.clear();
+        d_graph = g;
+    }
     // On redessine le QWidget
     update();
 }
