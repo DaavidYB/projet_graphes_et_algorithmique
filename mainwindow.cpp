@@ -4,6 +4,9 @@
 #include "composents/matadjinput.h"
 #include "composents/graphview.h"
 #include "composents/outputalgo.h"
+// #include "composents/taskinput.h"
+#include "composents/testordo.h"
+#include "composents/ordonnancement.h"
 #include <fstream>
 #include <QScreen>
 #include <QWidget>
@@ -157,8 +160,14 @@ void MainWindow::onGrapheReceived(const graphalgo::graph& g)
 
 void MainWindow::onExecAlgo() {
     int i = d_listeAlgorithmes->currentIndex();
-    auto output {new outputAlgo{i, d_graph}};
-    output->show();
+    if(i == 3) {
+        // auto output{new TestOrdo{}};
+        auto output{new ordonnancement{}};
+        output->show();
+    } else {
+        auto output {new outputAlgo{i, d_graph}};
+        output->show();
+    }
 }
 
 void MainWindow::onDessine()

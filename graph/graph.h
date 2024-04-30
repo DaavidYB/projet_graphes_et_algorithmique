@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <utility>
-using std::vector;
+using std::vector, std::string;
 #include <iostream>
 
 namespace graphalgo
@@ -15,6 +15,17 @@ namespace graphalgo
     };
 
     bool compare_vtx(const vtx &a, const vtx &b);
+
+    struct Tache {
+        string nom;
+        int duree;
+        std::vector<int> predecesseurs;
+        int dateTot, dateTard;
+
+        Tache(const string& nom, int duree, const std::vector<int>& predecesseurs)
+            : nom(nom), duree(duree), predecesseurs(predecesseurs)
+        {}
+    };
 
     class node
     {

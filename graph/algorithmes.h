@@ -72,6 +72,16 @@ namespace graphalgo{
     void traversee(int s, int &k, int &p, const std::vector<int> &fs, const std::vector<int> &aps, std::vector<int>& prem, std::vector<int>& pilch, std::vector<int>& cfc, std::vector<int>& pred, std::vector<int>& tarj, std::vector<bool>& entarj, std::vector<int>& num, std::vector<int>& ro);
     void fortconnexe(const std::vector<int>& fs, const std::vector<int>& aps, std::vector<int>& prem, std::vector<int>& pilch, std::vector<int>& cfc, std::vector<int>& pred);
     graphalgo::graph graph_reduit(const std::vector<int>& prem, const std::vector<int>& pilch, const std::vector<int>& cfc, const std::vector<int>& fs, const std::vector<int>& aps);
+
+    void calculerDateTot(std::vector<Tache>& taches);
+    std::vector<int> getSuccesseurs(const std::vector<Tache>& taches, int index);
+    void calculerDateTard(std::vector<Tache>& taches);
+    std::vector<Tache> cheminsCritiques(std::vector<Tache>& taches);
+    void FPAPPtoFSAPS(const vector<int>& fp, const vector<int>& app, vector<int>& fs, vector<int>& aps);
+    void FSAPStoFPAPP(const vector<int>& fs, const vector<int>& aps, vector<int>& fp, vector<int>& app);
+    void longueurCritique(const vector<int> file_pred, const vector<int> adr_prem_pred, const vector<int> duree_taches, vector<int>& file_pred_critique, vector<int>& adr_prem_pred_critique, vector<int>& longueur_critique);
+    vector<int> ordonnancement(const vector<int>& fs, const vector<int>& aps, const vector<int>& duree_taches, vector<int>& new_fs, vector<int>& new_aps);
+
 }
 
 #endif //PROJETGRAPHE_ALGORITHMES_H

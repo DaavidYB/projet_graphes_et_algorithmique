@@ -489,13 +489,15 @@ void graphalgo::fortconnexe(const std::vector<int>& fs, const std::vector<int>& 
 
 graphalgo::graph graphalgo::graph_reduit(const std::vector<int>& prem, const std::vector<int>& pilch, const std::vector<int>& cfc, const std::vector<int>& fs, const std::vector<int>& aps) {
     int s, kr = 1, k, t, nbc = prem[0];
-    std::vector<bool> deja_mis(nbc + 1, false);
+    std::vector<bool> deja_mis(nbc + 1);
     vector<int> fsr(fs[0] + 1);
     vector<int> apsr(nbc + 1);
     apsr[0] = nbc;
 
     for (int i = 1; i <= nbc; i++) {
         apsr[i] = kr;
+        for(int i=1;i<=nbc;i++)
+            deja_mis[i]=false;
         deja_mis[i] = true;
         s = prem[i];
         while (s != 0) {
@@ -515,4 +517,171 @@ graphalgo::graph graphalgo::graph_reduit(const std::vector<int>& prem, const std
 
     graphalgo::graph gr{fsr, apsr};
     return gr;
+}
+
+void graphalgo::calculerDateTot(std::vector<Tache>& taches) {
+    // Initialisation de la date au plus tôt à 0 pour la première tâche
+    taches[0].dateTot = 0;
+
+    // Calcul des dates au plus tôt pour les autres tâches
+    for (unsigned i = 1; i < taches.size(); i++) {
+        int maxPredDate = 0;
+        for (int pred : taches[i].predecesseurs) {
+            maxPredDate = std::max(maxPredDate, taches[pred - 1].dateTot);
+        }
+        taches[i].dateTot = maxPredDate + taches[i].duree;
+    }
+}
+
+std::vector<int> graphalgo::getSuccesseurs(const std::vector<Tache>& taches, int index) {
+    std::vector<int> successeurs;
+    for (int i = 0; i < taches.size(); i++) {
+        for (int pred : taches[i].predecesseurs) {
+            if (pred == index + 1) {
+                successeurs.push_back(i);
+                break;
+            }
+        }
+    }
+    return successeurs;
+}
+
+void graphalgo::calculerDateTard(std::vector<Tache>& taches) {
+    // Initialisation de la date au plus tard à la date au plus tôt de la dernière tâche
+    taches[taches.size() - 1].dateTard = taches[taches.size() - 1].dateTot;
+
+    // Calcul des dates au plus tard pour les autres tâches
+    for (int i = taches.size() - 2; i >= 0; i--) {
+        int minSuccDate = taches[taches.size() - 1].dateTard;
+        for (int succ : getSuccesseurs(taches, i + 1)) {
+            minSuccDate = std::min(minSuccDate, taches[succ].dateTard);
+        }
+        taches[i].dateTard = minSuccDate - taches[i].duree;
+    }
+}
+
+std::vector<graphalgo::Tache> graphalgo::cheminsCritiques(std::vector<Tache>& taches) {
+    std::vector<Tache> cheminsCritiques;
+
+    for (Tache& tache : taches) {
+        if (tache.dateTot == tache.dateTard) {
+            cheminsCritiques.push_back(tache);
+        }
+    }
+
+    return cheminsCritiques;
+}
+
+void graphalgo::FPAPPtoFSAPS(const vector<int>& fp, const vector<int>& app, vector<int>& fs, vector<int>& aps) {
+    int n = app[0];
+
+    aps.clear();
+    fs.clear();
+
+    aps.reserve(n + 1);
+    aps.push_back(n);
+
+    fs.reserve(fp[0] + 1);
+    fs.push_back(fp[0]);
+
+    for (int i = 1; i <= n; ++i) {
+        for (int j = 1; j <= fp[0]; ++j) {
+            if (fp[j] == i) {
+                unsigned k = 1;
+                while (k < app.size() and app[k] <= j) {
+                    ++k;
+                }
+                fs.push_back(k - 1);
+            }
+        }
+        fs.push_back(0);
+    }
+
+    aps.push_back(1);
+    for (unsigned i = 1; i < fs.size() - 1; ++i)
+        if (fs[i] == 0) aps.push_back(i + 1);
+}
+
+void graphalgo::FSAPStoFPAPP(const vector<int>& fs, const vector<int>& aps, vector<int>& fp, vector<int>& app) {
+    int n = aps[0] ;
+    app.push_back(n);
+    fp.push_back(fs[0]);
+    for(int i = 1 ; i <= n ; ++i)
+    {
+        app.push_back(fp.size());
+        for(int j = 1 ; j <= fs[0] ; ++j)
+        {
+            if(fs[j] == i)
+            {
+                int k = 1;
+                while(aps[k] <= j)
+                {
+                    k++;
+                }
+                fp.push_back(k-1);
+            }
+        }
+        fp.push_back(0);
+    }
+}
+
+void graphalgo::longueurCritique(const vector<int> file_pred, const vector<int> adr_prem_pred, const vector<int> duree_taches, vector<int>& file_pred_critique, vector<int>& adr_prem_pred_critique, vector<int>& longueur_critique) {
+    int n = adr_prem_pred[0];
+    int m = file_pred[0];
+
+    file_pred_critique.resize(m+1);
+    adr_prem_pred_critique.resize(n+1);
+    adr_prem_pred_critique[0] = n;
+
+    longueur_critique.resize(n+1);
+    longueur_critique[0] = n;
+
+    int kc = 1; //Indice de la dernière place remplie dans fpc
+    int t, lg; //la longueur lg de la tâche t
+    longueur_critique[1] = 0;
+    file_pred_critique[1] = 0; //Fin de la liste
+    adr_prem_pred_critique[1] = 1;
+
+    for(int s = 2 ; s <= n ; ++s)
+    {
+        //Calcul de lc[s] en fonction des prédecesseurs critiques de s
+        longueur_critique[s] = 0;
+        adr_prem_pred_critique[s] = kc+1; //Début de la liste des prédecesseurs critiques de s
+        for(int k = adr_prem_pred[s] ; (t = file_pred[k]) != 0 ; ++k)
+        {
+            lg = longueur_critique[t] + duree_taches[t];
+            if(lg >= longueur_critique[s])
+            {
+                if(lg > longueur_critique[s])
+                {
+                    longueur_critique[s] = lg; //Nouvelle lg candidate à être critique
+                    kc = adr_prem_pred_critique[s] ;
+                    file_pred_critique[kc] = t;
+                }
+                else //lg == lc[s]
+                {
+                    ++kc;
+                    file_pred_critique[kc] = t;
+                }
+            }
+        }
+        ++kc;
+        file_pred_critique[kc] = 0; //Fin de la liste des prédecesseurs critiques de s
+    }
+    file_pred_critique[0] = kc;
+}
+
+vector<int> graphalgo::ordonnancement(const vector<int>& fs, const vector<int>& aps, const vector<int>& duree_taches, vector<int>& new_fs, vector<int>& new_aps) {
+    vector<int> file_pred;
+    vector<int> adr_prem_pred;
+    vector<int> file_pred_critique;
+    vector<int> adr_prem_pred_critique;
+    vector<int> longueur_critique;
+
+    // On convertit le fs/aps en fp/app :
+    FSAPStoFPAPP(fs, aps, file_pred, adr_prem_pred);
+
+    longueurCritique(file_pred, adr_prem_pred, duree_taches, file_pred_critique, adr_prem_pred_critique, longueur_critique);
+
+    return longueur_critique;
 }

@@ -155,7 +155,7 @@ void outputAlgo::tarjan(graphalgo::graph &g)
     mainLayout->addWidget(separationLine);
 
     // Récupérer le résultat de Kruskal
-    graphalgo::graph p{8, true};
+    /*graphalgo::graph p{8, true};
     p.add_successor(1, 2);
     p.add_successor(1, 3);
     p.add_successor(1, 4);
@@ -168,7 +168,25 @@ void outputAlgo::tarjan(graphalgo::graph &g)
     p.add_successor(6, 7);
     p.add_successor(6, 8);
     p.add_successor(7, 4);
-    p.add_successor(8, 7);
+    p.add_successor(8, 7);*/
+
+    graphalgo::graph p{10, true};
+    p.add_successor(1, 2);
+    p.add_successor(1, 3);
+    p.add_successor(2, 4);
+    p.add_successor(2, 5);
+    p.add_successor(4, 6);
+    p.add_successor(5, 6);
+    p.add_successor(6, 7);
+    p.add_successor(7, 3);
+    p.add_successor(7, 5);
+    p.add_successor(7, 2);
+    p.add_successor(8, 1);
+    p.add_successor(8, 9);
+    p.add_successor(9, 10);
+    p.add_successor(10, 4);
+    p.add_successor(10, 9);
+    p.add_successor(10, 8);
 
     vector<int> fs, aps, prem, pilch, cfc, pred;
     p.fs_aps(fs, aps);

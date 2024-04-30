@@ -12,7 +12,10 @@ SOURCES += \
     composents/coutinput.cpp \
     composents/fsapsInput.cpp \
     composents/matadjinput.cpp \
+    composents/ordonnancement.cpp \
     composents/outputalgo.cpp \
+    composents/taskinput.cpp \
+    composents/testordo.cpp \
     composents/vertexinput.cpp \
     composents/graphview.cpp \
     graph/algorithmes.cpp \
@@ -24,7 +27,10 @@ HEADERS += \
     composents/coutinput.h \
     composents/fsapsInput.h \
     composents/matadjinput.h \
+    composents/ordonnancement.h \
     composents/outputalgo.h \
+    composents/taskinput.h \
+    composents/testordo.h \
     composents/vertexinput.h \
     composents/graphview.h \
     graph/algorithmes.h \
