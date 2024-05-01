@@ -35,3 +35,9 @@ HEADERS += \
 qnx: target.path = /tmp/$${TARGET}/bin
 else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
+
+resources.files = \
+    assets/Logo_Graphe.png
+resources.prefix = /
+
+RESOURCES = resources
