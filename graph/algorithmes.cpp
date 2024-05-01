@@ -245,64 +245,39 @@ graphalgo::graph graphalgo::dijkstra(int s_depart, graphalgo::graph &g)
     return newG;
 }
 
-vector<vector<int>> graphalgo::dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout)
+bool graphalgo::dantzig(vector<vector<int>>& c)
 {
-    int i, j, k;
-    // Récupère le nombre de nœuds du graphe
-    int n = matriceAdj[0][0];
-    vector<vector<int>> tabDantzig(n, vector<int>(n));
+    // Initialisation
+    int n = c.size();
+    int k, i, j;
+    double x;
 
-    // Initialisation de la matrice des coûts
-    for (i = 0; i < n; i++)
+    for(k = 0; k < n - 1; k++)
     {
-        for (j = 0; j < n; j++)
+        for(i = 0; i < k; i++)
         {
-            if (matriceAdj[i][j+1] != 0)
-                tabDantzig[i][j] = matriceCout[i][j+1];
-            else
-                // Valeur arbitrairement grande pour représenter l'infini
-                tabDantzig[i][j] = __INT_MAX__;
-        }
-        // Valeur spéciale pour indiquer la diagonale de la matrice
-        tabDantzig[i][i] = -__INT_MAX__;
-    }
-
-    // On représente la distance minimal afin de verifier la distance minimal
-    int t = tabDantzig[2][1] + tabDantzig[1][2];
-    for (k = 1; k < n - 1; k++)
-    {
-        for (i = 0; i <= k; i++)
-        {
-            for (j = 0; j <= k; j++)
+            for(j = 0; j < k; j++)
             {
-                int temp = tabDantzig[i][j] + tabDantzig[j][k+1];
-                if(tabDantzig[i][k+1] > temp && i != j && j != k+1)
-                    tabDantzig[i][k+1] = temp;
+                if((x = c[i][j] + c[j][k]) < c[i][k])
+                    c[i][k] = x;
 
-                temp = tabDantzig[k+1][j] + tabDantzig[j][i];
-                if (tabDantzig[k+1][i] > temp && i != j && j != k+1)
-                    tabDantzig[k+1][i] = temp;
+                if((x = c[k][j] + c[j][i]) < c[k][i])
+                    c[k+1][i] = x;
             }
-            int temp = tabDantzig[k+1][j] + tabDantzig[j][k+1];
-            if (t > temp && j != k+1)
-                t = temp;
-
-            // S'il y a un circuit absorbant, retourne un message d'erreur
-            if (t < 0)
-                return {};
-
-        }
-        for (i = 0; i <= k; i++)
-        {
-            for (j = 0; j <= k; j++)
+            if(c[i][k] + c[k][i] < 0)
             {
-                int temp = tabDantzig[i][k+1] + tabDantzig[k+1][j];
-                if (tabDantzig[i][j] > temp && k+1 != j && j != k+1)
-                    tabDantzig[i][j] = temp;
+                // cout<< "Circuit absorbant passant par " << i << " et " << k+1 << "." << endl;
+                return false;
             }
         }
+        for(i = 0; i < k; i++)
+            for(j = 0; j < k; j++)
+            {
+                if((x = c[i][k] + c[k][j]) < c[i][j])
+                    c[i][j] = x;
+            }
     }
-    return tabDantzig;
+    return true;
 }
 
 void graphalgo::fusion(int s, int t, vector<int>& prem, vector<int>& pilch, vector<int>& cfc) {
@@ -650,7 +625,7 @@ void graphalgo::longueurCritique(const vector<int> file_pred, const vector<int> 
     longueur_critique[0] = n;
 
     int kc = 1; // Indice de la dernière place remplie dans fpc
-    int t, lg; // la longueur lg de la tâche t
+    int t, lg; // La longueur lg de la tâche t
     longueur_critique[1] = 0;
     file_pred_critique[1] = 0; //Fin de la liste
     adr_prem_pred_critique[1] = 1;
@@ -679,7 +654,7 @@ void graphalgo::longueurCritique(const vector<int> file_pred, const vector<int> 
             }
         }
         kc++;
-        file_pred_critique[kc] = 0; //Fin de la liste des prédecesseurs critiques de s
+        file_pred_critique[kc] = 0; // Fin de la liste des prédecesseurs critiques de s
     }
     file_pred_critique[0] = kc;
 }

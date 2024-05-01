@@ -262,7 +262,7 @@ void outputAlgo::dantzig(graphalgo::graph &g)
     auto mainLayout = new QVBoxLayout{this};
 
     // Titre de la fenêtre
-        auto title = new QLabel("Affiche de l'algorithme de danzig");
+        auto title = new QLabel("Affiche de l'algorithme de Dantzig");
     mainLayout->addWidget(title);
 
     // Ajout d'une ligne de séparation
@@ -270,8 +270,31 @@ void outputAlgo::dantzig(graphalgo::graph &g)
     separationLine->setFrameStyle(QFrame::HLine | QFrame::Sunken);
     mainLayout->addWidget(separationLine);
 
-    // à compléter
-    mainLayout->addStretch(1);
+    vector<vector<int>> res = g.cost_matrice();
+    if(graphalgo::dantzig(res)) {
+        graphalgo::graph temp{g.mat_adj(), g.oriented()};
+
+        // Mettre à jour les coûts dans le graphe temp
+        for (int i = 1; i <= temp.n(); i++)
+        {
+            for(int j = 1; j <= temp.n(); j++)
+            {
+                if(res[i - 1][j - 1] != -__INT_MAX__)
+                {
+                    temp.cost(i, j, res[i - 1][j - 1]);
+                }
+            }
+        }
+
+        // Afficher le graphe mis à jour
+        auto graphV = new graphView{temp};
+        mainLayout->addWidget(graphV);
+
+    } else {
+        auto results {new QLabel{"Il y a la présence d'un circuit absorbant, impossible d'exécuter Dantzig."}};
+        mainLayout->addWidget(results);
+    }
+
 }
 
 void outputAlgo::kruskal(graphalgo::graph& g) {

@@ -56,10 +56,9 @@ namespace graphalgo{
     graphalgo::graph dijkstra(int s, graphalgo::graph &g);
     /**
      * @brief Fonction appliquant l'algorithme de dantzig.
-     * @param matriceAdj La matrice d'adjacence
-     * @param matriceCout La matrice des coûts associée
+     * @param matriceAdj La matrice
      */
-    vector<vector<int>> dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout);
+    bool dantzig(vector<vector<int>>& c);
     /**
      * @brief Applique l'algorithme de Kruskal pour trouver l'arbre couvrant de poids minimal.
      * @param G Le graphe.
