@@ -206,6 +206,7 @@ void MainWindow::onGrapheReceived(const graphalgo::graph& g)
 {
     // Mettre à jour l'affichage du graphe
     d_graph = g;
+    setOptions();
     d_graphview->graphChanged(d_graph);
 
     // Fermer la fenêtre de saisie
