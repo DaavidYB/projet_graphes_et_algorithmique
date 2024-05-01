@@ -123,7 +123,6 @@ void coutInput::createInterfaceMATADJ()
 
 void coutInput::createGraph()
 {
-    // graphalgo::graph newG{static_cast<unsigned int>(fs.size() > 0 ? fs[0] : matAdj[0][0]), d_oriented};
     graphalgo::graph newG{static_cast<unsigned int>(matAdj[0][0]), d_oriented};
 
     // On parcourt la matrice d'adjacence

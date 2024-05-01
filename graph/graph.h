@@ -8,20 +8,46 @@ using std::vector, std::string;
 
 namespace graphalgo
 {
+    /**
+     * @brief Structure représentant une arête dans le graphe.
+     */
     struct vtx
     {
-        int s,t;
+        /// Le sommet de départ de l'arête
+        int s;
+        /// Le sommet de destination de l'arête
+        int t;
+        /// Le poids ou le coût de l'arête
         int p;
     };
 
+    /**
+     * @brief Compare deux structures vtx en fonction de leur poids.
+     * @param a Première structure vtx.
+     * @param b Deuxième structure vtx.
+     * @return true si le poids de a est inférieur à celui de b, sinon false.
+     */
     bool compare_vtx(const vtx &a, const vtx &b);
 
+    /**
+     * @brief Structure représentant une tâche dans le contexte de l'ordonnancement.
+     */
     struct Tache {
+        /// Le nom de la tâche.
         string nom;
+        /// La durée nécessaire pour compléter la tâche.
         int duree;
+        /// Les indices des tâches qui la précèdent.
         std::vector<int> predecesseurs;
+        /// Les dates au plus tôt et au plus tard d'exécution.
         int dateTot, dateTard;
 
+        /**
+         * @brief Constructeur de la structure Tache.
+         * @param nom Le nom de la tâche.
+         * @param duree La durée nécessaire pour compléter la tâche.
+         * @param predecesseurs Les indices des tâches précédentes.
+         */
         Tache(const string& nom, int duree, const std::vector<int>& predecesseurs)
             : nom(nom), duree(duree), predecesseurs(predecesseurs)
         {}
@@ -30,11 +56,28 @@ namespace graphalgo
     class node
     {
         public:
+            /**
+             * @brief Constructor for the node class.
+             * @param n The value of the node or the cost.
+             */
             node(int n);
 
-            //getters
+            /**
+             * @brief Getter method for retrieving the value of the node or the cost.
+             * @return The value of the node.
+             */
             int n() const;
+            /**
+             * @brief Getter method for retrieving the pointer to the next node in the main list.
+             * This can represent either a consecutive successor (1 -> 2) or its successor in the graph (1 <---> 3).
+             * @return A reference to the next node in the main list.
+             */
             node& next_m() const;
+            /**
+             * @brief Getter method for retrieving the pointer to the next node in the secondary list.
+             * This can be either a cost or the next cost of the current cost.
+             * @return A reference to the next node in the secondary list.
+             */
             node& next_s() const;
         private:
             /**
@@ -102,8 +145,21 @@ namespace graphalgo
 
             // methods
 
+            /**
+             * @brief return the orientation of a graph
+             * @return the orientation
+             */
             bool oriented() const;
+            /**
+             * @brief set an orientation to a graph
+             * @param oriented -  the orientation
+             */
             void oriented(bool oriented);
+            /**
+             * @brief Méthode publique retournant si le graph possède des coûts
+             * @return
+             */
+            bool graphaveccout() const;
 
             /**
              * @brief find a node
@@ -173,23 +229,45 @@ namespace graphalgo
              */
             vector<vtx> vertexes() const;
 
+            /**
+             * @brief Returns the adjacency matrix of cost of the graph.
+             * @return A 2D vector representing the adjacency matrix of cost.
+             */
             vector<vector<int>> cost_matrice() const;
+            /**
+             * @brief Saves the graph to an output stream.
+             * @param ost The output stream to which the graph will be saved.
+             */
             void save(std::ostream& ost) const;
+            /**
+             * @brief Loads the graph from an input stream.
+             * @param ist The input stream from which the graph will be loaded.
+             */
             void load(std::istream& ist);
+            /**
+             * @brief Assigns the contents of another graph to this graph.
+             * @param g The graph to copy from.
+             * @return A reference to this graph after assignment.
+             */
             graph& operator=(const graph &g);
+            /**
+             * @brief Checks if this graph is equal to another graph.
+             * @param g The graph to compare with.
+             * @return True if the graphs are equal, false otherwise.
+             */
             bool operator==(const graph& g);
 
         private:
-            // nb of node
+            /// nb of node
             int d_n;
-            // the graph is oriented or not
+            /// the graph is oriented or not
             bool d_oriented;
-            // entry point if the list
+            /// entry point if the list
             node* d_tete;
 
-            // @brief create an adjacency matrix for a not oriented graph
+            /// @brief create an adjacency matrix for a not oriented graph
             void mat_adj_not_oriented(vector<vector<int>>& mat_adj);
-            // @brief create an adjacency matrix for an oriented graph
+            /// @brief create an adjacency matrix for an oriented graph
             void mat_adj_oriented(vector<vector<int>>& mat_adj);
     };
 }

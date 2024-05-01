@@ -1,7 +1,3 @@
-//
-// Created by Arthur Mathis on 22/04/2024.
-//
-
 #include "algorithmes.h"
 #include "graph.h"
 
@@ -248,71 +244,6 @@ graphalgo::graph graphalgo::dijkstra(int s_depart, graphalgo::graph &g)
     return newG;
 }
 
-/*graphalgo::graph dijkstra(int s, graphalgo::graph &g) {
-    int ind;
-    int i, j, k, v, m;
-    bool oriented = g.oriented();
-    std::vector<int> fs, aps;
-    g.fs_aps(fs, aps);
-    std::vector<std::vector<int>> p = g.cost_matrice();
-    int n = aps[0];
-    m = fs[0];
-
-    // Initialiser les tableaux et structures de données
-    std::vector<int> pr(n + 1, -1);
-    std::vector<int> d(n + 1, graphalgo::MAXPOIDS);
-    std::vector<int> inS(n + 1, 1); // 1 pour les sommets à traiter
-
-    for (i = 0;i < n; i++)
-        d[i+1] = p[s-1][i];
-
-    // Initialiser les tableaux de résultats
-    d[s] = 0;
-    pr[s] = 0;
-    inS[s] = 0; // Marquer le sommet 's' comme traité
-    ind = n - 1; // Nombre d'éléments restants à traiter
-
-    while (ind > 0) {
-        // Trouver le sommet non traité avec la plus petite distance
-        m = graphalgo::MAXPOIDS;
-        for (int i = 1; i <= n; i++) {
-            if (inS[i] == 1 && d[i] < m) {
-                m = d[i];
-                j = i;
-            }
-        }
-
-        // S'il n'y a plus de sommets à traiter, terminer
-        if (m == graphalgo::MAXPOIDS) break;
-
-        inS[j] = 0; // Marquer le sommet 'j' comme traité
-        ind--;
-
-        // Mettre à jour les distances et les prédécesseurs pour les successeurs de 'j'
-        k = aps[j];
-        while (fs[k] != 0) {
-            if (inS[fs[k]] == 1) {
-                v = d[j] + p[j-1][fs[k]-1];
-                if (v < d[fs[k]]) {
-                    d[fs[k]] = v;
-                    pr[fs[k]] = j;
-                }
-            }
-            k++;
-        }
-    }
-
-    // Construction du graphe résultant à partir des prédécesseurs
-    graphalgo::graph result(n, oriented);
-    for (int i = 1; i <= n; i++) {
-        if (pr[i] != -1) {
-            result.add_successor(pr[i], i, d[i]);
-        }
-    }
-
-    return result;
-}*/
-
 vector<vector<int>> graphalgo::dantzig(const vector<vector<int>> &matriceAdj, const vector<vector<int>> &matriceCout)
 {
     int i, j, k;
@@ -488,36 +419,53 @@ void graphalgo::fortconnexe(const std::vector<int>& fs, const std::vector<int>& 
 }
 
 graphalgo::graph graphalgo::graph_reduit(const std::vector<int>& prem, const std::vector<int>& pilch, const std::vector<int>& cfc, const std::vector<int>& fs, const std::vector<int>& aps) {
+    // Initialisation des variables
     int s, kr = 1, k, t, nbc = prem[0];
+    // Vecteur pour vérifier si un sommet a déjà été ajouté
     std::vector<bool> deja_mis(nbc + 1);
+    // Vecteurs pour stocker les nouveaux FS ET APS
     vector<int> fsr(fs[0] + 1);
     vector<int> apsr(nbc + 1);
     apsr[0] = nbc;
 
+    // Parcours des composantes fortement connexes
     for (int i = 1; i <= nbc; i++) {
+        // Initialisation du nouvel indice pour le prochain successeur
         apsr[i] = kr;
-        for(int i=1;i<=nbc;i++)
+        // Réinitialisation du vecteur de vérification
+        for(int i = 1; i <= nbc; i++)
             deja_mis[i]=false;
+        // Marquage de la composante fortement connexe actuelle
         deja_mis[i] = true;
+        // Récupération du premier sommet de la composante fortement connexe
         s = prem[i];
+        // Parcours des successeurs du sommet actuel
         while (s != 0) {
             for (int k = aps[s]; (t = fs[k]) != 0; k++) {
+                // Si la composante fortement connexe du successeur n'a pas encore été ajoutée
                 if (deja_mis[cfc[t]] == false) {
+                    // Ajout de la composante fortement connexe comme nouveau successeur
                     fsr[kr] = cfc[t];
                     kr++;
+                    // Marquage de la composante fortement connexe comme déjà ajoutée
                     deja_mis[cfc[t]] = true;
                 }
             }
+            // Passage au sommet suivant dans la composante fortement connexe
             s = pilch[s];
         }
+        // Ajout d'un marqueur de fin de liste de successeurs pour la composante fortement connexe actuelle
         fsr[kr] = 0;
         kr++;
     }
+    // Mise à jour du nombre total de successeurs
     fsr[0] = kr - 1;
 
+    // Création du graphe réduit à partir des nouveaux FS et APS
     graphalgo::graph gr{fsr, apsr};
     return gr;
 }
+
 
 void graphalgo::calculerDateTot(std::vector<Tache>& taches) {
     // Initialisation de la date au plus tôt à 0 pour la première tâche
@@ -534,15 +482,23 @@ void graphalgo::calculerDateTot(std::vector<Tache>& taches) {
 }
 
 std::vector<int> graphalgo::getSuccesseurs(const std::vector<Tache>& taches, int index) {
+    // Vecteur pour stocker les successeurs de la tâche à l'index donné
     std::vector<int> successeurs;
+
+    // Parcours de toutes les tâches
     for (int i = 0; i < taches.size(); i++) {
+        // Parcours des prédécesseurs de la tâche à l'index i
         for (int pred : taches[i].predecesseurs) {
+            // Si un prédécesseur correspond à l'index donné, la tâche à l'index i est un successeur
             if (pred == index + 1) {
+                // Ajout de l'index de la tâche en tant que successeur
                 successeurs.push_back(i);
+                // Arrêt de la recherche des prédécesseurs pour cette tâche
                 break;
             }
         }
     }
+
     return successeurs;
 }
 
@@ -636,17 +592,17 @@ void graphalgo::longueurCritique(const vector<int> file_pred, const vector<int> 
     longueur_critique.resize(n+1);
     longueur_critique[0] = n;
 
-    int kc = 1; //Indice de la dernière place remplie dans fpc
-    int t, lg; //la longueur lg de la tâche t
+    int kc = 1; // Indice de la dernière place remplie dans fpc
+    int t, lg; // la longueur lg de la tâche t
     longueur_critique[1] = 0;
     file_pred_critique[1] = 0; //Fin de la liste
     adr_prem_pred_critique[1] = 1;
 
-    for(int s = 2 ; s <= n ; ++s)
+    for(int s = 2 ; s <= n ; s++)
     {
-        //Calcul de lc[s] en fonction des prédecesseurs critiques de s
+        // Calcul de lc[s] en fonction des prédecesseurs critiques de s
         longueur_critique[s] = 0;
-        adr_prem_pred_critique[s] = kc+1; //Début de la liste des prédecesseurs critiques de s
+        adr_prem_pred_critique[s] = kc+1; // Début de la liste des prédecesseurs critiques de s
         for(int k = adr_prem_pred[s] ; (t = file_pred[k]) != 0 ; ++k)
         {
             lg = longueur_critique[t] + duree_taches[t];
@@ -654,24 +610,25 @@ void graphalgo::longueurCritique(const vector<int> file_pred, const vector<int> 
             {
                 if(lg > longueur_critique[s])
                 {
-                    longueur_critique[s] = lg; //Nouvelle lg candidate à être critique
+                    longueur_critique[s] = lg; // Nouvelle lg candidate à être critique
                     kc = adr_prem_pred_critique[s] ;
                     file_pred_critique[kc] = t;
                 }
                 else //lg == lc[s]
                 {
-                    ++kc;
+                    kc++;
                     file_pred_critique[kc] = t;
                 }
             }
         }
-        ++kc;
+        kc++;
         file_pred_critique[kc] = 0; //Fin de la liste des prédecesseurs critiques de s
     }
     file_pred_critique[0] = kc;
 }
 
 vector<int> graphalgo::ordonnancement(const vector<int>& fs, const vector<int>& aps, const vector<int>& duree_taches, vector<int>& new_fs, vector<int>& new_aps) {
+    // Création des vecteurs à utiliser
     vector<int> file_pred;
     vector<int> adr_prem_pred;
     vector<int> file_pred_critique;
@@ -681,6 +638,7 @@ vector<int> graphalgo::ordonnancement(const vector<int>& fs, const vector<int>& 
     // On convertit le fs/aps en fp/app :
     FSAPStoFPAPP(fs, aps, file_pred, adr_prem_pred);
 
+    // On récupère les longueurs critiques
     longueurCritique(file_pred, adr_prem_pred, duree_taches, file_pred_critique, adr_prem_pred_critique, longueur_critique);
 
     return longueur_critique;

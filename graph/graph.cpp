@@ -137,6 +137,25 @@ namespace graphalgo
 
     void graph::oriented(bool oriented) { d_oriented = oriented; }
 
+    bool graph::graphaveccout() const
+    {
+        vector<vector<int>> matCout = this->cost_matrice();
+
+        bool res = false;
+        unsigned i = 0;
+        while(!res && i < matCout.size())
+        {
+            unsigned j = 0;
+            while(!res && j < matCout[i].size())
+            {
+                if(matCout[i][j] != 0 && matCout[i][j] != 1)
+                    res = true;
+            }
+        }
+
+        return res;
+    }
+
     node* graph::find(int s) const
     {
         if(!d_tete)

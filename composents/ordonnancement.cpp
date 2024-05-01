@@ -16,14 +16,14 @@ ordonnancement::ordonnancement(QWidget *parent)
 
 ordonnancement::~ordonnancement()
 {
+    // On supprime les pointeurs
     delete d_title;
-    delete d_layoutNbTasks;;
-    delete d_labelNbTasks;
-    delete d_editNbTasks;
+    delete d_layoutNbTaches;;
+    delete d_editNbTaches;
 
     delete d_layoutGraph;
 
-    delete d_layoutTasks;
+    delete d_layoutTaches;
     delete d_resultsLabel;
     delete d_validateButton;
 
@@ -52,19 +52,19 @@ void ordonnancement::createInterface()
     mainLayout->addLayout(d_layoutGraph);
 
     // Nombre de tâches
-    d_layoutNbTasks = new QHBoxLayout();
+    d_layoutNbTaches = new QHBoxLayout();
     auto labelNbTasks = new QLabel("Nombre de tâches :");
     QRegularExpression intRegx("[0-9]+");
-    d_editNbTasks = new QLineEdit;
-    d_editNbTasks->setValidator(new QRegularExpressionValidator(intRegx));
-    connect(d_editNbTasks, &QLineEdit::textChanged, this, &ordonnancement::onNbChange);
-    d_layoutNbTasks->addWidget(labelNbTasks);
-    d_layoutNbTasks->addWidget(d_editNbTasks);
-    mainLayout->addLayout(d_layoutNbTasks);
+    d_editNbTaches = new QLineEdit;
+    d_editNbTaches->setValidator(new QRegularExpressionValidator(intRegx));
+    connect(d_editNbTaches, &QLineEdit::textChanged, this, &ordonnancement::onNbChange);
+    d_layoutNbTaches->addWidget(labelNbTasks);
+    d_layoutNbTaches->addWidget(d_editNbTaches);
+    mainLayout->addLayout(d_layoutNbTaches);
 
     // Création du layout pour les tâches et son ajout au layout principal
-    d_layoutTasks = new QVBoxLayout;
-    mainLayout->addLayout(d_layoutTasks);
+    d_layoutTaches = new QVBoxLayout;
+    mainLayout->addLayout(d_layoutTaches);
 
     // Ajout d'un espacement vertical
     mainLayout->addSpacing(10);
@@ -85,22 +85,24 @@ void ordonnancement::createInterface()
 }
 
 void ordonnancement::effacerLignes() {
+    // On supprime les labels et edits de chaque ligne, en retirant le widget et le supprimant
     for (QLineEdit *edit : d_lignesNom) {
-        d_layoutTasks->removeWidget(edit);
+        d_layoutTaches->removeWidget(edit);
         delete edit;
     }
     for (QLineEdit *edit : d_lignesDuree) {
-        d_layoutTasks->removeWidget(edit);
+        d_layoutTaches->removeWidget(edit);
         delete edit;
     }
     for (QLineEdit *edit : d_lignesPredecesseurs) {
-        d_layoutTasks->removeWidget(edit);
+        d_layoutTaches->removeWidget(edit);
         delete edit;
     }
     for (QLabel *label : d_labelsTaches) {
-        d_layoutTasks->removeWidget(label);
+        d_layoutTaches->removeWidget(label);
         delete label;
     }
+    // On vide les tableaux
     d_lignesNom.clear();
     d_lignesDuree.clear();
     d_lignesPredecesseurs.clear();
@@ -117,37 +119,37 @@ void ordonnancement::createLines(int nbLines)
         QHBoxLayout *layoutLigne = new QHBoxLayout;
 
         // Ajouter le label de la tâche
-        QLabel *labelTask = new QLabel(QString("Tâche %1 :").arg(i + 1));
-        d_labelsTaches.append(labelTask);
-        layoutLigne->addWidget(labelTask);
+        QLabel *labelTache = new QLabel(QString("Tâche %1 :").arg(i + 1));
+        d_labelsTaches.append(labelTache);
+        layoutLigne->addWidget(labelTache);
 
         // Ajouter le champ de saisie du nom de la tâche
-        QLineEdit *editTaskName = new QLineEdit;
-        editTaskName->setPlaceholderText("Nom de la tâche");
-        d_lignesNom.append(editTaskName);
-        layoutLigne->addWidget(editTaskName);
+        QLineEdit *editTacheNom = new QLineEdit;
+        editTacheNom->setPlaceholderText("Nom de la tâche");
+        d_lignesNom.append(editTacheNom);
+        layoutLigne->addWidget(editTacheNom);
 
         // Ajouter le champ de saisie de la durée de la tâche
         QRegularExpression intRegx("[0-9]+");
-        QLineEdit *editTaskDuration = new QLineEdit;
-        editTaskDuration->setValidator(new QRegularExpressionValidator(intRegx));
-        editTaskDuration->setPlaceholderText("Durée de la tâche");
-        d_lignesDuree.append(editTaskDuration);
-        layoutLigne->addWidget(editTaskDuration);
+        QLineEdit *editTacheDuree = new QLineEdit;
+        editTacheDuree->setValidator(new QRegularExpressionValidator(intRegx));
+        editTacheDuree->setPlaceholderText("Durée de la tâche");
+        d_lignesDuree.append(editTacheDuree);
+        layoutLigne->addWidget(editTacheDuree);
 
         // Ajouter le champ de saisie des prédécesseurs de la tâche
-        QLineEdit *editTaskPredecessors = new QLineEdit;
-        editTaskPredecessors->setPlaceholderText("Prédécesseurs (séparés par des espaces)");
-        d_lignesPredecesseurs.append(editTaskPredecessors);
-        layoutLigne->addWidget(editTaskPredecessors);
+        QLineEdit *editTachePredecesseurs = new QLineEdit;
+        editTachePredecesseurs->setPlaceholderText("Prédécesseurs (séparés par des espaces)");
+        d_lignesPredecesseurs.append(editTachePredecesseurs);
+        layoutLigne->addWidget(editTachePredecesseurs);
 
-        d_layoutTasks->addLayout(layoutLigne);
+        d_layoutTaches->addLayout(layoutLigne);
     }
 }
 
 void ordonnancement::onNbChange()
 {
-    int nbLines = d_editNbTasks->text().toInt();
+    int nbLines = d_editNbTaches->text().toInt();
     createLines(nbLines);
 }
 
@@ -160,15 +162,15 @@ bool ordonnancement::validationInput(std::vector<graphalgo::Tache>& taches)
         int duree = d_lignesDuree[i]->text().toInt();
         QStringList predecesseursStr = d_lignesPredecesseurs[i]->text().split(" ", Qt::SkipEmptyParts);
         std::vector<int> predecesseurs;
-        for (const QString& predecessor : predecesseursStr)
+        for (const QString& predecesseur : predecesseursStr)
         {
             bool ok;
-            int predecessorInt = predecessor.toInt(&ok);
-            if (!ok || predecessorInt < 1 || predecessorInt > d_lignesNom.size()) {
-                QMessageBox::critical(nullptr, "Erreur de saisie", QString("Le prédécesseur '%1' de la tâche %2 est invalide.").arg(predecessor).arg(i+1));
+            int predecesseurInt = predecesseur.toInt(&ok);
+            if (!ok || predecesseurInt < 1 || predecesseurInt > d_lignesNom.size()) {
+                QMessageBox::critical(nullptr, "Erreur de saisie", QString("Le prédécesseur '%1' de la tâche %2 est invalide.").arg(predecesseur).arg(i+1));
                 return false;
             }
-            predecesseurs.push_back(predecessorInt);
+            predecesseurs.push_back(predecesseurInt);
         }
         graphalgo::Tache t{nom.toStdString(), duree, predecesseurs};
         taches.push_back(t);
@@ -178,40 +180,48 @@ bool ordonnancement::validationInput(std::vector<graphalgo::Tache>& taches)
 
 graphalgo::graph ordonnancement::buildGraph(const std::vector<graphalgo::Tache>& taches)
 {
+    // On récupère le nombre de tâches
     int n = taches.size();
     std::vector<int> fp, app;
     app.resize(n + 1);
     app[0] = n;
     fp.push_back(n);
 
+    // On construit FP APP
     for (int i = 0; i < n; i++) {
         app[i + 1] = fp.size();
-        for(int predecessor : taches[i].predecesseurs) {
-            fp.push_back(predecessor);
+        for(int predecesseur : taches[i].predecesseurs) {
+            fp.push_back(predecesseur);
         }
         fp.push_back(0);
     }
 
     fp[0] = fp.size() - 1;
 
+    // On le convertit en FS APS
     std::vector<int> fs, aps;
     graphalgo::FPAPPtoFSAPS(fp, app, fs, aps);
 
+    // On retourne le graph correspondant
     return graphalgo::graph(fs, aps);
 }
 
 void ordonnancement::effaceAffichage() {
+    // On efface les lignes
     effacerLignes();
-    QLayoutItem* edit = d_layoutNbTasks->takeAt(0);
+
+    // On retire les widgets pour gérer le nombre de tâches
+    QLayoutItem* edit = d_layoutNbTaches->takeAt(0);
     delete edit->widget();
     delete edit;
-    QLayoutItem* label = d_layoutNbTasks->takeAt(0);
+    QLayoutItem* label = d_layoutNbTaches->takeAt(0);
     delete label->widget();
     delete label;
 }
 
 void ordonnancement::updateResults(const std::vector<graphalgo::Tache>& taches, graphalgo::graph &g, const std::vector<int>& longueurCritique, const std::vector<graphalgo::Tache>& cheminsCritique)
 {
+    // On met à jour l'affichage
     effaceAffichage();
     d_title->setText("Affichage des résultats de l'ordonnancement");
 
@@ -229,12 +239,12 @@ void ordonnancement::updateResults(const std::vector<graphalgo::Tache>& taches, 
     }
 
     resultsText += "\n\nDates au plus tôt :";
-    for (int i = 0; i < taches.size(); i++) {
+    for (unsigned i = 0; i < taches.size(); i++) {
         resultsText += "\nTâche " + QString::fromStdString(taches[i].nom) + ": " + QString::number(taches[i].dateTot);
     }
 
     resultsText += "\n\nDates au plus tard :";
-    for (int i = 0; i < taches.size(); i++) {
+    for (unsigned i = 0; i < taches.size(); i++) {
         resultsText += "\nTâche " + QString::fromStdString(taches[i].nom) + ": " + QString::number(taches[i].dateTard);
     }
     d_resultsLabel->setText(resultsText);
@@ -271,6 +281,7 @@ void ordonnancement::onValidate()
     // Calculer les résultats et mettre à jour l'interface
     updateResults(taches, g, longueurCritique, cheminsCritique);
 
+    // On cache le bouton
     QPushButton* clickedButton = qobject_cast<QPushButton*>(sender());
     clickedButton->hide();
 }

@@ -44,6 +44,7 @@ void fsapsInput::createInterface()
     separationLine->setFrameStyle(QFrame::HLine|QFrame::Sunken);
     d_mainLayout->addWidget(separationLine);
 
+    // Création du checkbox pour l'ajout par la suite de côuts
     auto coutLayout {new QHBoxLayout{}};
     d_mainLayout->addLayout(coutLayout);
     d_labelCout = new QLabel{"Avec coûts :"};

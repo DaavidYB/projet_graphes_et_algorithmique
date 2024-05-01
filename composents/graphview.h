@@ -10,6 +10,11 @@
 
 class graphNode{
 public :
+    /**
+     * @brief Constructeur d'un noeud du graphe
+     * @param index Son index
+     * @param coordonnees Son point, avec ses coordonnées
+     */
     graphNode(int index, QPoint coordonnees);
 
     /**
@@ -95,13 +100,11 @@ private :
      * @return
      */
     std::vector<graphNode> calculePositions(std::vector<graphalgo::vtx> vertex);
-    // std::vector<graphNode> calculePositions();
 
     /**
      * @brief Méthode générant la représentation graphique d'un graph
      * @param g Le graph à illustrer
      */
-    // void dessineGraph(QPainter &painter, graphalgo::graph &g);
     void dessineGraph(QPainter &painter);
 
 public slots :

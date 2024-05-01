@@ -27,7 +27,6 @@ QPoint graphNode::coordonnees() const
 graphView::graphView(graphalgo::graph &g, QWidget *parent)
     : QWidget{parent}, d_graph{g}
 {
-    // g.fs_aps(fs, aps);
 }
 
 graphView::~graphView()
@@ -44,6 +43,7 @@ QSize graphView::sizeHint() const
 void graphView::paintEvent(QPaintEvent *)
 {
     QPainter painter{this};
+    // On dessine le graphe si il contient des noeuds
     if(d_graph.n() > 0)
         dessineGraph(painter);
 }

@@ -63,6 +63,7 @@ void matAdjInput::createInterface()
     d_radioButtonOriente  = new QCheckBox{};
     d_preSaisieLayout->addWidget(d_radioButtonOriente);
 
+    // Choix de l'ajout ou non de coûts
     d_coutLayout = new QHBoxLayout{};
     d_mainLayout->addLayout(d_coutLayout);
     d_labelCout = new QLabel{"Avec coûts :"};
@@ -88,12 +89,14 @@ void matAdjInput::createInterface()
     d_valideLayout->addStretch(1);
     d_valideLayout->addWidget(d_bValide);
 
+    // Connexion du changement de la matrice
     connect(d_inputnbSommets, &QLineEdit::textChanged, [=](const QString &text) {
         bool ok;
         unsigned value = text.toUInt(&ok);
 
         if (ok) onNbSommets(value);
     });
+    // Connexion du bouton valider
     connect(d_bValide, &QPushButton::clicked, this, &matAdjInput::createGraph);
 }
 

@@ -4,8 +4,6 @@
 #include "composents/matadjinput.h"
 #include "composents/graphview.h"
 #include "composents/outputalgo.h"
-// #include "composents/taskinput.h"
-#include "composents/testordo.h"
 #include "composents/ordonnancement.h"
 #include <fstream>
 #include <QScreen>
@@ -79,7 +77,9 @@ void MainWindow::createInterface()
     d_listeAlgorithmes->addItem("Chemins les plus courts selon Dantzig");
     d_listeAlgorithmes->addItem("Arbre recouvrant minimal d'un graphe non orienté selon Kruskal");
     d_listeAlgorithmes->addItem("Codage de Prüfer");
+    setOptions();
     d_buttonLancerAlgo = new QPushButton{"Lancer"};
+
     // On implémente le QVBoxLayout
     listeAlgoLayout->addWidget(d_listeAlgorithmes);
     listeAlgoLayout->addWidget(d_buttonLancerAlgo);
@@ -112,7 +112,7 @@ void MainWindow::createInterface()
     auto buttonSauvegarder {new QPushButton{"Sauvegarder le graph"}};
     buttonLayout->addWidget(buttonSauvegarder);
 
-
+    // On connecte les boutons
     connect(buttonDessin, &QPushButton::clicked, this, &MainWindow::onDessine);
     connect(buttonSaisie, &QPushButton::clicked, this, &MainWindow::onSaisie);
     connect(buttonFichier, &QPushButton::clicked, this, &MainWindow::onTelecharge);
@@ -140,7 +140,64 @@ void MainWindow::loadGraph()
 
 void MainWindow::setOptions() const
 {
+    // On regarde si le graph possède des coûts
+    bool c = d_graph.graphaveccout();
+    // Ordonnancement est constamment activer
+    if(d_graph.oriented()){
+        if(c){
+            // On active les algorithmes : ordonnancement, dijkstra, dantzig
+            d_listeAlgorithmes->setItemData(0, false, Qt::UserRole - 1);
+            d_listeAlgorithmes->setItemData(1, false, Qt::UserRole - 1);
+            d_listeAlgorithmes->setItemData(2, false, Qt::UserRole - 1);
+            d_listeAlgorithmes->setItemData(3, false, Qt::UserRole); // Ordonnancement
+            d_listeAlgorithmes->setItemData(4, false, Qt::UserRole); // Dijkstra
+            d_listeAlgorithmes->setItemData(5, false, Qt::UserRole); // Dantzig
+            d_listeAlgorithmes->setItemData(6, false, Qt::UserRole - 1);
+            d_listeAlgorithmes->setItemData(7, false, Qt::UserRole - 1);
+            // On règle l'indice courant
+            d_listeAlgorithmes->setCurrentIndex(3);
 
+        } else {
+
+            // On active les algorithmes : distance, rang, tarjan
+            d_listeAlgorithmes->setItemData(0, false, Qt::UserRole); // Distance
+            d_listeAlgorithmes->setItemData(1, false, Qt::UserRole); // Rang
+            d_listeAlgorithmes->setItemData(2, false, Qt::UserRole); // Tarjan
+            d_listeAlgorithmes->setItemData(3, false, Qt::UserRole);
+            d_listeAlgorithmes->setItemData(4, false, Qt::UserRole - 1);
+            d_listeAlgorithmes->setItemData(5, false, Qt::UserRole - 1);
+            d_listeAlgorithmes->setItemData(6, false, Qt::UserRole - 1);
+            d_listeAlgorithmes->setItemData(7, false, Qt::UserRole - 1);
+            // On règle l'indice courant
+            d_listeAlgorithmes->setCurrentIndex(0);
+        }
+
+    } else if(c){
+        // On active les algorithmes : Kruskal
+        d_listeAlgorithmes->setItemData(0, false, Qt::UserRole - 1);
+        d_listeAlgorithmes->setItemData(1, false, Qt::UserRole - 1);
+        d_listeAlgorithmes->setItemData(2, false, Qt::UserRole - 1);
+        d_listeAlgorithmes->setItemData(3, false, Qt::UserRole);
+        d_listeAlgorithmes->setItemData(4, false, Qt::UserRole - 1);
+        d_listeAlgorithmes->setItemData(5, false, Qt::UserRole - 1);
+        d_listeAlgorithmes->setItemData(6, false, Qt::UserRole); // Kruskal
+        d_listeAlgorithmes->setItemData(7, false, Qt::UserRole - 1);
+        // On règle l'indice courant
+        d_listeAlgorithmes->setCurrentIndex(6);
+
+    } else {
+        // On active l'algorithme : Prufer
+        d_listeAlgorithmes->setItemData(0, false, Qt::UserRole - 1);
+        d_listeAlgorithmes->setItemData(1, false, Qt::UserRole - 1);
+        d_listeAlgorithmes->setItemData(2, false, Qt::UserRole - 1);
+        d_listeAlgorithmes->setItemData(3, false, Qt::UserRole);
+        d_listeAlgorithmes->setItemData(4, false, Qt::UserRole - 1);
+        d_listeAlgorithmes->setItemData(5, false, Qt::UserRole - 1);
+        d_listeAlgorithmes->setItemData(6, false, Qt::UserRole - 1);
+        d_listeAlgorithmes->setItemData(7, false, Qt::UserRole); // Prüfer
+        // On règle l'indice courant
+        d_listeAlgorithmes->setCurrentIndex(7);
+    }
 }
 
 // MÉTHODES ONCLIC
@@ -160,8 +217,8 @@ void MainWindow::onGrapheReceived(const graphalgo::graph& g)
 
 void MainWindow::onExecAlgo() {
     int i = d_listeAlgorithmes->currentIndex();
+    // Lancer le bon algorithme
     if(i == 3) {
-        // auto output{new TestOrdo{}};
         auto output{new ordonnancement{}};
         output->show();
     } else {
@@ -178,6 +235,7 @@ void MainWindow::onDessine()
 void MainWindow::onSaisie()
 {
     int i = d_listeSaisie->currentIndex();
+    // On lance la bonne fenêtre
     switch (i)
     {
         case 0 :
