@@ -391,7 +391,6 @@ void MainWindow::onTelecharge()
                 d_graph = g;
                 // On met à jour l'affichage
                 updateGraph();
-                //d_graphview->graphChanged(g);
             } else {
                 QMessageBox::critical(this, "Erreur d'importation", "Impossible de lire le fichier.");
             }
