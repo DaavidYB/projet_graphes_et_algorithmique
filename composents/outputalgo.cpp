@@ -185,14 +185,24 @@ void outputAlgo::tarjan(graphalgo::graph &g)
     p.add_successor(10, 9);
     p.add_successor(10, 8);*/
 
-    vector<int> fs, aps, prem, pilch, cfc, pred;
+    vector<int> fs, aps, fsr, apsr, prem, pilch, cfc, pred, br;
     // p.fs_aps(fs, aps);
     g.fs_aps(fs, aps);
+    // On calcule le graph réduit
     graphalgo::fortconnexe(fs, aps, prem, pilch, cfc, pred);
     graphalgo::graph gr = graphalgo::graph_reduit(prem, pilch, cfc, fs, aps);
 
+    // On récupère les bases
+    gr.fs_aps(fsr, apsr);
+    graphalgo::base_Greduit(apsr, fsr, br);
+    QString bases = QString::fromStdString(graphalgo::edition_bases(prem, pilch, br));
+
     auto graphview {new graphView{gr}};
     mainLayout->addWidget(graphview);
+
+    auto results {new QLabel{}};
+    results->setText(bases);
+    mainLayout->addWidget(results);
 }
 
 void outputAlgo::calculerDijkstra(graphalgo::graph& g)

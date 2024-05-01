@@ -1,5 +1,6 @@
 #include "algorithmes.h"
 #include "graph.h"
+#include <sstream>
 
 void graphalgo::empiler(int x, vector<int>& pilch) {
     pilch[x] = pilch[0];
@@ -466,6 +467,62 @@ graphalgo::graph graphalgo::graph_reduit(const std::vector<int>& prem, const std
     return gr;
 }
 
+void graphalgo::base_Greduit(const vector<int>& apsr, const vector<int>& fsr, vector<int>& br)
+{
+    int nr = apsr[0];
+    br.resize(nr + 1);
+    vector<int> ddir(nr + 1);
+
+    for(int i = 0; i <= nr; i++)
+        ddir[i] = 0;
+
+    for(int kr = 1; kr <= fsr[kr]; kr++)
+        ddir[fsr[kr]]++;
+
+    int nb = 0;
+    for(int c = 1; c <= nr; c++)
+        if (ddir[c] == 0)
+            br[++nb] = c;
+
+    br[0] = nb;
+}
+
+std::string graphalgo::afficher(const std::vector<int>& base)
+{
+    std::stringstream ss;
+    ss << "Bases : ";
+
+    for (unsigned i = 0; i < base.size(); i++)
+        ss << base[i] << " ";
+
+    ss << "\n";
+    return ss.str();
+}
+
+std::string graphalgo::edition_bases(const vector<int>& prem, const vector<int>& pilch, const vector<int>& br)
+{
+    int nb = br[0]; // Nombre de CFC de l’unique base du graphe réduit
+    vector<int> Base(nb + 1); // pile qui mémorise les sommets des bases du graphe initial
+    Base[0] = nb;
+    int p = 1;
+    int som = prem[br[1]]; // premier sommet de la première CFC
+
+    std::stringstream ss;
+    while (p >= 1) {
+        if ((p <= nb) && (som != 0)) {
+            Base[p] = som;
+            p++;
+            if (p <= nb)
+                som = prem[br[p]];
+            else
+                ss << afficher(Base); // Affiche le contenu du tableau Base contenant les sommets d’une base du graphe initial
+        } else {
+            p--;
+            som = pilch[Base[p]];
+        }
+    }
+    return ss.str();
+}
 
 void graphalgo::calculerDateTot(std::vector<Tache>& taches) {
     // Initialisation de la date au plus tôt à 0 pour la première tâche

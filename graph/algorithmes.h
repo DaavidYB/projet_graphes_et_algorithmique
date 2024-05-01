@@ -110,6 +110,25 @@ namespace graphalgo{
      */
     graphalgo::graph graph_reduit(const std::vector<int>& prem, const std::vector<int>& pilch, const std::vector<int>& cfc, const std::vector<int>& fs, const std::vector<int>& aps);
     /**
+     * @brief Calcule les bases du graphe réduit.
+     * @param apsr Vecteur des débuts de liste de successeurs du graphe réduit.
+     * @param fsr Vecteur des listes de successeurs du graphe réduit.
+     * @param br Vecteur qui contiendra les bases du graphe réduit après le calcul.
+     */
+    void base_Greduit(const vector<int>& apsr, const vector<int>& fsr, vector<int>& br);
+    /**
+     * @brief Permet l'affichage des bases
+     */
+    std::string afficher(const std::vector<int>& base);
+    /**
+     * @brief Réalise l'édition des bases du graphe initial.
+     * @param prem Vecteur des sommets de chaque base dans le graphe initial.
+     * @param pilch Pile chainée
+     * @param br Vecteur contenant les bases du graphe réduit.
+     * @return Les bases
+     */
+    std::string edition_bases(const vector<int>& prem, const vector<int>& pilch, const vector<int>& br);
+    /**
      * @brief Calcule les dates au plus tôt pour les tâches.
      * @param taches Les tâches à traiter.
      */
