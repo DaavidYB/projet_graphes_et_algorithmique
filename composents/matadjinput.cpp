@@ -194,29 +194,25 @@ bool matAdjInput::recupereValide(std::vector<std::vector<int>> &matAdj) const
     return valide;
 }
 
-// !! Modifier pour orienter le graph !!
 void matAdjInput::createGraph()
 {
     // générér le graph selon un tableau 2D d'entier
     std::vector<std::vector<int>> matAdj;
     if(recupereValide(matAdj)){
-        // Graph orienté
-        if(d_radioButtonOriente->isChecked()){
-            if(d_checkCouts->isChecked()){
-                updateInterface(matAdj);
-
-            } else {
-                graphalgo::graph g{matAdj};
-                emit graphe(g);
-            }
-
-        // Graph non-orienté avec coûts
-        }  else if(d_checkCouts->isChecked()){
+        // Graph avec coûts
+        if(d_checkCouts->isChecked()){
             updateInterface(matAdj);
 
-        // Graph non-orienté sans coûts
+        // Graph sans coûts / orienté
+        } else if(d_radioButtonOriente->isChecked()) {
+            // On construit le graph orienté à partie de la matrice d'adjacence
+            graphalgo::graph g{matAdj, true};
+            emit graphe(g);
+
+        // Graph sans coûts / non-orienté
         } else {
-            graphalgo::graph g{matAdj};
+            // On construit le graph non-orienté à partie de la matrice d'adjacence
+            graphalgo::graph g{matAdj, false};
             emit graphe(g);
         }
     } else {

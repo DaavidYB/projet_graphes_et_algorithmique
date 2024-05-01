@@ -6,6 +6,7 @@
 #include <QButtonGroup>
 #include "composents/graphview.h"
 
+class QLabel;
 class QComboBox;
 class QPushButton;
 
@@ -27,9 +28,14 @@ private:
      */
     // graphalgo::graph d_graph;
     graphalgo::graph d_graph{
-        {31, 2, 3, 0, 4, 9, 0, 4, 6, 8, 0, 8, 9, 11, 0, 3, 6, 0, 7, 8, 0, 8, 0, 10, 0, 0, 11, 0, 10, 12, 0, 0},
-        {12, 1, 4, 7, 11, 15, 18, 21, 23, 25, 26, 28, 31}
+        {12, 2, 3, 4, 0, 2, 3, 4, 0, 5, 0, 0},
+        {5, 1, 5, 9, 11, 12}
     };
+
+    /**
+     * @brief Attribut privé stockant l'affichage textuel du graphe courant
+     */
+    QLabel *d_labelFS, *d_labelAPS;
 
     /**
      * @brief La liste des algorithmes
@@ -45,22 +51,27 @@ private:
     QWidget* d_currentInputWindow = nullptr;
 
     /**
-     * @brief Méthode privée générant les composants de la mainWindow
-     */
-    void createInterface();
-    /**
      * @brief QWidget affichant la représentation graphique de d_graph
      */
     graphView *d_graphview;
 
     /**
-     * @brief Méthode privée chargeant le graph par défaut
+     * @brief Méthode privée générant les composants de la mainWindow
      */
-    void loadGraph();
+    void createInterface();
+    /**
+     * @brief Méthode privée mettant à jour le graph courant
+     */
+    void updateGraph();
+
     /**
      * @brief Méthode privée permettant d'adapter la sélectioner d'algorithmes (d_listeAlgorithmes) au graph courant (d_graph)
      */
     void setOptions() const;
+    /**
+     * @brief Méthode privée permettant d'afficher les tavleaux fs et aps du graph courant (d_graph)
+     */
+    void afficheFSAPS();
 
 private slots:
     /**
@@ -74,10 +85,6 @@ private slots:
      */
     void onExecAlgo();
 
-    /**
-     * @brief Méthode privée réagissant au clic du bouton buttonDessin et permetttant la saisie graphique d'un graph
-     */
-    void onDessine();
     /**
      * @brief Méthode privée réagissant au clic du bouton buttonSaisie et permettant la saisie textuelle d'un graph
      */
