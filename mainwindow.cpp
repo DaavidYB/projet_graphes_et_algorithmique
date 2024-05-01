@@ -15,6 +15,7 @@
 #include <QFile>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QListWidget>
 
 #include <string>
 
@@ -89,8 +90,8 @@ void MainWindow::createInterface()
     auto buttonLayout {new QVBoxLayout};
     horizonthalLayout->addLayout(buttonLayout);
     // On génère le bouton de saisie graphique
-    auto buttonDessin {new QPushButton{"Dessiner un nouveau graph"}};
-    buttonLayout->addWidget(buttonDessin);
+    auto buttonInfo {new QPushButton{"Explications des algorithmes"}};
+    buttonLayout->addWidget(buttonInfo);
 
     // On génère les options de saisies textuelles
     auto saisieLayout {new QHBoxLayout};
@@ -113,7 +114,7 @@ void MainWindow::createInterface()
     buttonLayout->addWidget(buttonSauvegarder);
 
     // On connecte les boutons
-    connect(buttonDessin, &QPushButton::clicked, this, &MainWindow::onDessine);
+    connect(buttonInfo, &QPushButton::clicked, this, &MainWindow::onInfo);
     connect(buttonSaisie, &QPushButton::clicked, this, &MainWindow::onSaisie);
     connect(buttonFichier, &QPushButton::clicked, this, &MainWindow::onTelecharge);
     connect(buttonSauvegarder, &QPushButton::clicked, this, &MainWindow::onSauvegarde);
@@ -228,9 +229,61 @@ void MainWindow::onExecAlgo() {
     }
 }
 
-void MainWindow::onDessine()
+void MainWindow::onInfo()
 {
-    // à compléter
+    // Créer le QDialog
+    QDialog* infoDialog = new QDialog(this);
+    infoDialog->setWindowTitle("Explications des algorithmes");
+
+    // Créer les widgets à l'intérieur du QDialog
+    QComboBox* algoComboBox = new QComboBox;
+    QLabel* explicationLabel = new QLabel{};
+    QPushButton* closeButton = new QPushButton("Fermer");
+
+    // Ajouter les options dans la combobox
+    algoComboBox->addItem("Calcul des distances");
+    algoComboBox->addItem("Détermination du rang des sommets");
+    algoComboBox->addItem("Détermination des composantes fortement connexes selon Tarjan");
+    algoComboBox->addItem("Problème d'ordonnancement");
+    algoComboBox->addItem("Chemins les plus courts selon Dijkstra");
+    algoComboBox->addItem("Chemins les plus courts selon Dantzig");
+    algoComboBox->addItem("Arbre recouvrant minimal d'un graphe non orienté selon Kruskal");
+    algoComboBox->addItem("Codage de Prüfer");
+
+    // Définir les explications pour chaque algorithme
+    QString explications[8] = {
+        "Calcule les distances les plus courtes entre un sommet source et tous les autres sommets d'un graphe pondéré.",
+        "Détermine le rang de chaque sommet dans un graphe orienté, représentant le nombre maximal de sommets atteignables.",
+        "Identifie les composantes fortement connexes dans un graphe orienté.",
+        "Résout le problème d'ordonnancement des tâches, minimisant la durée totale du projet.",
+        "Calcule les chemins les plus courts entre un sommet source et les autres sommets d'un graphe orienté pondéré.",
+        "Calcule les chemins les plus courts entre un sommet source et les autres sommets d'un graphe pondéré orienté.",
+        "Trouve un arbre recouvrant minimal d'un graphe non orienté et pondéré.",
+        "Encode un arbre étiqueté avec n sommets dans une séquence d'entiers, représentant les degrés des sommets."
+    };
+
+    explicationLabel->setText(explications[0]);
+
+
+    // Connecter le changement de sélection de la combobox avec l'affichage des explications
+    connect(algoComboBox, QOverload<int>::of(&QComboBox::activated), [=](int index) {
+        explicationLabel->setText(explications[index]);
+    });
+
+    // Connecter le bouton de fermeture avec la fermeture du QDialog
+    connect(closeButton, &QPushButton::clicked, infoDialog, &QDialog::close);
+
+    // Layouts
+    QVBoxLayout* layout = new QVBoxLayout(infoDialog);
+    layout->addWidget(algoComboBox);
+    layout->addWidget(explicationLabel);
+    layout->addWidget(closeButton);
+
+    // Afficher le QDialog
+    infoDialog->exec();
+
+    // Nettoyage de la mémoire
+    delete infoDialog;
 }
 
 void MainWindow::onSaisie()

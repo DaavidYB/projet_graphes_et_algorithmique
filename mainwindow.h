@@ -74,9 +74,9 @@ private slots:
     void onExecAlgo();
 
     /**
-     * @brief Méthode privée réagissant au clic du bouton buttonDessin et permetttant la saisie graphique d'un graph
+     * @brief Méthode privée réagissant au clic du bouton buttoninfo et permetttant l'affichage des explications des algorithmes
      */
-    void onDessine();
+    void onInfo();
     /**
      * @brief Méthode privée réagissant au clic du bouton buttonSaisie et permettant la saisie textuelle d'un graph
      */
