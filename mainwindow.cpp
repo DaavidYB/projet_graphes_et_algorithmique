@@ -9,6 +9,7 @@
 #include <QScreen>
 #include <QWidget>
 #include <QBoxLayout>
+#include <QLabel>
 #include <QComboBox>
 #include <QPushButton>
 #include <QList>
@@ -16,8 +17,6 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QListWidget>
-
-#include <string>
 
 // CONSTRUCTEURS
 
@@ -49,7 +48,7 @@ void MainWindow::createInterface()
     QRect  screenGeometry = screen->geometry();
     int height = screenGeometry.height();
     int width = screenGeometry.width();
-    setMinimumSize(width - (width * 0.20), height - (height * 0.2));
+    setMinimumSize(width - (width * 0.40), height - (height * 0.20));
 
     // On crée le widget principal
     auto mainWidget {new QWidget{this}};
@@ -61,6 +60,13 @@ void MainWindow::createInterface()
     // Ajout du widget de graph
     d_graphview = new graphView{d_graph, this};
     mainVerticalLayout->addWidget(d_graphview);
+
+    // Ajout de l'affichage textuel du graph courant
+    d_labelFS = new QLabel{};
+    mainVerticalLayout->addWidget(d_labelFS);
+    d_labelAPS = new QLabel{};
+    mainVerticalLayout->addWidget(d_labelAPS);
+    afficheFSAPS();
 
     // On crére et implémente le layout horithal
     auto horizonthalLayout {new QHBoxLayout};
@@ -122,23 +128,6 @@ void MainWindow::createInterface()
     connect(d_buttonLancerAlgo, &QPushButton::clicked, this, &MainWindow::onExecAlgo);
 }
 
-void MainWindow::loadGraph()
-{
-    // On initialise le flux de lecture
-    std::string source{"./assets/graph_courant.graph"};
-    std::ifstream import_graph_courant {source};
-
-    // On test la lecture
-    if(import_graph_courant.good()){
-        // On importe le graph courant
-        graphalgo::graph g{};
-        g.load(import_graph_courant);
-        d_graph = g;
-
-    // Sinon
-    } else QMessageBox::critical(this, "Erreur de lecture", "Le fichier graph_courant.graph est introuvable");
-}
-
 void MainWindow::setOptions() const
 {
     // On regarde si le graph possède des coûts
@@ -159,14 +148,13 @@ void MainWindow::setOptions() const
             d_listeAlgorithmes->setCurrentIndex(3);
 
         } else {
-
             // On active les algorithmes : distance, rang, tarjan
             d_listeAlgorithmes->setItemData(0, false, Qt::UserRole); // Distance
             d_listeAlgorithmes->setItemData(1, false, Qt::UserRole); // Rang
             d_listeAlgorithmes->setItemData(2, false, Qt::UserRole); // Tarjan
             d_listeAlgorithmes->setItemData(3, false, Qt::UserRole);
-            d_listeAlgorithmes->setItemData(4, false, Qt::UserRole - 1);
-            d_listeAlgorithmes->setItemData(5, false, Qt::UserRole - 1);
+            d_listeAlgorithmes->setItemData(4, false, Qt::UserRole);
+            d_listeAlgorithmes->setItemData(5, false, Qt::UserRole);
             d_listeAlgorithmes->setItemData(6, false, Qt::UserRole - 1);
             d_listeAlgorithmes->setItemData(7, false, Qt::UserRole - 1);
             // On règle l'indice courant
@@ -194,12 +182,50 @@ void MainWindow::setOptions() const
         d_listeAlgorithmes->setItemData(3, false, Qt::UserRole);
         d_listeAlgorithmes->setItemData(4, false, Qt::UserRole - 1);
         d_listeAlgorithmes->setItemData(5, false, Qt::UserRole - 1);
-        d_listeAlgorithmes->setItemData(6, false, Qt::UserRole - 1);
+        d_listeAlgorithmes->setItemData(6, false, Qt::UserRole);
         d_listeAlgorithmes->setItemData(7, false, Qt::UserRole); // Prüfer
         // On règle l'indice courant
         d_listeAlgorithmes->setCurrentIndex(7);
     }
 }
+
+void MainWindow::afficheFSAPS()
+{
+    // On vide les anciens textes
+    d_labelFS->clear();
+    d_labelAPS->clear();
+
+    // On récupère les tableaux fs et aps
+    vector<int> fs, aps;
+    d_graph.fs_aps(fs, aps);
+
+    // On prépare l'affichage sous forme de QString
+    QString fsStr;
+    for (int val : fs)
+        fsStr += QString::number(val) + ", ";
+
+    // On supprime la dernière virgule et l'espace
+    fsStr.chop(2);
+
+    QString apsStr;
+    for (int val : aps)
+        apsStr += QString::number(val) + ", ";
+
+    // On supprime la dernière virgule et l'espace
+    apsStr.chop(2);
+
+    // On affiche les valeurs de fs et aps
+    d_labelFS->setText({"FS: " + fsStr});
+    d_labelAPS->setText({"APS: " + apsStr});
+}
+
+void MainWindow::updateGraph()
+{
+    d_graphview->graphChanged(d_graph);
+    afficheFSAPS();
+    setOptions();
+}
+
 
 // MÉTHODES ONCLIC
 
@@ -207,8 +233,7 @@ void MainWindow::onGrapheReceived(const graphalgo::graph& g)
 {
     // Mettre à jour l'affichage du graphe
     d_graph = g;
-    setOptions();
-    d_graphview->graphChanged(d_graph);
+    updateGraph();
 
     // Fermer la fenêtre de saisie
     if(d_currentInputWindow) {
@@ -365,7 +390,8 @@ void MainWindow::onTelecharge()
                 g.load(ifs);
                 d_graph = g;
                 // On met à jour l'affichage
-                d_graphview->graphChanged(g);
+                updateGraph();
+                //d_graphview->graphChanged(g);
             } else {
                 QMessageBox::critical(this, "Erreur d'importation", "Impossible de lire le fichier.");
             }

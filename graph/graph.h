@@ -162,6 +162,12 @@ namespace graphalgo
             bool graphaveccout() const;
 
             /**
+             * @brief Méthode publique retournant si le graph possède des coûts
+             * @return
+             */
+            bool graphaveccout() const;
+
+            /**
              * @brief find a node
              * @param s: the node to find
              * @return the pointer to the node

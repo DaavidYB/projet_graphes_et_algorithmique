@@ -39,7 +39,7 @@ else: unix:!android: target.path = /opt/$${TARGET}/bin
 !isEmpty(target.path): INSTALLS += target
 
 resources.files = \
-    assets/graph_courant.graph
+    assets/Logo_Graphe.png
 resources.prefix = /
 
 RESOURCES = resources
