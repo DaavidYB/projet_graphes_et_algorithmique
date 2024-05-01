@@ -14,8 +14,6 @@ SOURCES += \
     composents/matadjinput.cpp \
     composents/ordonnancement.cpp \
     composents/outputalgo.cpp \
-    composents/taskinput.cpp \
-    composents/testordo.cpp \
     composents/vertexinput.cpp \
     composents/graphview.cpp \
     graph/algorithmes.cpp \
@@ -29,8 +27,6 @@ HEADERS += \
     composents/matadjinput.h \
     composents/ordonnancement.h \
     composents/outputalgo.h \
-    composents/taskinput.h \
-    composents/testordo.h \
     composents/vertexinput.h \
     composents/graphview.h \
     graph/algorithmes.h \
